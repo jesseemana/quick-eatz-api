@@ -7,12 +7,12 @@ const findById = async (id: string) => {
 }
 
 const findUser = async ({ auth0Id }: { auth0Id: string }) => {
-  const user = await User.findOne({ auth0Id });
+  const user = await User.findOne({ auth0Id: auth0Id });
   return user;
 }
 
-const createUser = async (data: Partial<UserType>) => {
-  const user = await User.create(data);
+const createUser = async ({ auth0Id, email }: { auth0Id: string, email: string }) => {
+  const user = await User.create({ auth0Id, email });
   return user;
 }
 
