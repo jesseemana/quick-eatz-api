@@ -1,11 +1,18 @@
 import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import connectDb from './utils/database';
-import { UserRoute, OrderRoute, RestaurantRoute, MyRestaurantRoute, } from './routes';
+import connectDB from './utils/database';
+import { 
+  UserRoute, 
+  OrderRoute, 
+  RestaurantRoute, 
+  MyRestaurantRoute, 
+} from './routes';
 
 const app = express();
-const PORT = parseInt(process.env.PORT as string)|| 7000;
+const PORT = parseInt(process.env.PORT as string)|| 3001;
+
+connectDB();
 
 app.use(cors());
 app.use(express.json());
@@ -19,7 +26,4 @@ app.use('/api/my/user', UserRoute);
 app.use('/api/restaurant', RestaurantRoute);
 app.use('/api/my/restaurant', MyRestaurantRoute);
 
-app.listen(PORT, async () => {
-  await connectDb();
-  console.log('server started on http://localhost:7000');
-});
+app.listen(PORT, () => console.log(`server started on http://localhost:${PORT}`));
