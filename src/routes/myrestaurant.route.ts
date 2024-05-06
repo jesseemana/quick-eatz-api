@@ -15,7 +15,7 @@ router.route('/')
     MyRestaurantController.updateMyRestaurant
   );
 
-router.get('/order', [jwtCheck, jwtParse], MyRestaurantController.getMyRestaurantOrders);
+router.get('/orders', [jwtCheck, jwtParse], MyRestaurantController.getMyRestaurantOrders);
 
 router.patch(
   '/order/:orderId/status', 
