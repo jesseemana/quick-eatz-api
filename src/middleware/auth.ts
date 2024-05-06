@@ -6,6 +6,7 @@ import UserService from '../services/user.service';
 declare global {
   namespace Express {
     interface Request {
+      user: {};
       userId: string;
       auth0Id: string;
     }
@@ -29,11 +30,12 @@ const jwtParse = async (req: Request, res: Response, next: NextFunction) => {
 
   try {
     const decoded = jwt.decode(token) as JwtPayload;
-    const auth0Id = String(decoded.sub);
+    const auth0Id = decoded.sub as string;
 
     const user = await UserService.findUser({ auth0Id });
     if (!user) return res.sendStatus(401);
 
+    req.user = user.toJSON();
     req.auth0Id = auth0Id as string;
     req.userId = user._id.toString();
     next();

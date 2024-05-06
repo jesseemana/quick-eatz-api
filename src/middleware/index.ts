@@ -1,11 +1,5 @@
 import { upload } from './multer';
 import { jwtParse, jwtCheck } from './auth';
-import { validateMyUserRequest, validateMyRestaurantRequest } from './validation';
+import { validateInput } from './validation';
 
-export { 
-  upload, 
-  jwtCheck, 
-  jwtParse, 
-  validateMyUserRequest, 
-  validateMyRestaurantRequest, 
-}
+export { upload, jwtCheck, jwtParse, validateInput, }
