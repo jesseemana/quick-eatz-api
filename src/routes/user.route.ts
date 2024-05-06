@@ -1,14 +1,12 @@
-import { Router } from "express";
-import MyUserController from "../controllers/user.controller";
-import { jwtCheck, jwtParse } from "../middleware/auth";
-import { validateMyUserRequest } from "../middleware/validation";
+import { Router } from 'express';
+import MyUserController from '../controllers/user.controller';
+import { jwtCheck, jwtParse, validateInput, } from '../middleware';
 
 const router = Router();
 
-router.post("/", jwtCheck, MyUserController.registerUser);
-
-router.get("/", jwtCheck, jwtParse, MyUserController.getCurrentUser);
-
-router.put("/", jwtCheck, jwtParse, validateMyUserRequest, MyUserController.updateCurrentUser);
+router.route('/')
+  .get([jwtCheck, jwtParse], MyUserController.getCurrentUser)
+  .post(jwtCheck, MyUserController.registerUser)
+  .put([jwtCheck, jwtParse, validateInput], MyUserController.updateCurrentUser);
 
 export default router;

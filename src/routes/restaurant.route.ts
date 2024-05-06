@@ -1,27 +1,11 @@
-import { Router } from "express";
-import { param } from "express-validator";
-import RestaurantController from "../controllers/restaurant.controller";
+import { Router } from 'express';
+import RestaurantController from '../controllers/restaurant.controller';
+import { validateInput } from '../middleware';
 
 const router = Router();
 
-router.get(
-  "/:restaurantId",
-  param("restaurantId")
-    .isString()
-    .trim()
-    .notEmpty()
-    .withMessage("RestaurantId paramenter must be a valid string"),
-  RestaurantController.getRestaurant
-);
+router.get('/:restaurantId', validateInput, RestaurantController.getRestaurant);
 
-router.get(
-  "/search/:city",
-  param("city")
-    .isString()
-    .trim()
-    .notEmpty()
-    .withMessage("City paramenter must be a valid string"),
-  RestaurantController.searchRestaurant
-);
+router.get('/search/:city', validateInput, RestaurantController.searchRestaurant);
 
 export default router;

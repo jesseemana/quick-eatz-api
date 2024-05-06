@@ -1,29 +1,26 @@
-import { Router } from "express";
-import multer from "multer";
-import { jwtCheck, jwtParse } from "../middleware/auth";
-import { validateMyRestaurantRequest } from "../middleware/validation";
-import MyRestaurantController from "../controllers/myrestaurant.controller";
+import { Router } from 'express';
+import MyRestaurantController from '../controllers/myrestaurant.controller';
+import { upload, jwtCheck, jwtParse, validateInput, } from '../middleware';
 
 const router = Router();
 
-const { getMyRestaurant, getMyRestaurantOrders, updateMyRestaurant, createMyRestaurant, updateOrderStatus } = MyRestaurantController;
+router.route('/')
+  .get([jwtCheck, jwtParse], MyRestaurantController.getMyRestaurant)
+  .post(
+    [upload.single('imageFile'), validateInput, jwtCheck, jwtParse], 
+    MyRestaurantController.createMyRestaurant
+  )
+  .put( 
+    [upload.single('imageFile'), validateInput, jwtCheck, jwtParse], 
+    MyRestaurantController.updateMyRestaurant
+  );
 
-const storage = multer.memoryStorage();
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5mb
-  },
-});
+router.get('/order', [jwtCheck, jwtParse], MyRestaurantController.getMyRestaurantOrders);
 
-router.get("/", [jwtCheck, jwtParse], getMyRestaurant);
-
-router.get("/order", [jwtCheck, jwtParse], getMyRestaurantOrders);
-
-router.patch("/order/:orderId/status", [jwtCheck, jwtParse], updateOrderStatus);
-
-router.put("/", [upload.single("imageFile"), validateMyRestaurantRequest, jwtCheck, jwtParse], updateMyRestaurant);
-
-router.post("/", [upload.single("imageFile"), validateMyRestaurantRequest, jwtCheck, jwtParse], createMyRestaurant);
+router.patch(
+  '/order/:orderId/status', 
+  [jwtCheck, jwtParse], 
+  MyRestaurantController.updateOrderStatus
+);
 
 export default router;
