@@ -1,88 +1,88 @@
-import { Request, Response } from "express";
-import mongoose from "mongoose";
-import { uploadImage } from "../utils/upload";
-import { OrderService, RestaurantService } from "../services";
+import { Request, Response } from 'express';
+import mongoose from 'mongoose';
+import uploadImage from '../utils/upload';
+import { OrderService, RestaurantService } from '../services';
+import { RestaurantType } from '../schema/restaurant.schema';
 
 
 const getMyRestaurant = async (req: Request, res: Response) => {
   try {
-    const restaurant = await RestaurantService.findRestaurant({ user: req.userId });
-    if (!restaurant) {
-      return res.status(404).json({ message: "restaurant not found." });
-    }
-    res.json(restaurant);
+    const restaurant = await RestaurantService.findRestaurant({ user_id: req.userId });
+    if (!restaurant) { return res.status(404).json({ message: 'restaurant not found.' }); }
+    return res.status(200).json(restaurant);
   } catch (error) {
-    console.log("error", error);
-    res.status(500).json({ message: "Internal Server Error." });
+    console.log('An error occured', error);
+    res.status(500).json({ message: 'Internal Server Error.' });
   }
 };
 
 
-const createMyRestaurant = async (req: Request, res: Response) => {
+const createMyRestaurant = async (
+  req: Request, 
+  res: Response
+) => {
   try {
-    const existing_restaurant = await RestaurantService.findRestaurant({ user: req.userId });
+    const body = req.body;
+    
+    const existing_restaurant = await RestaurantService.findRestaurant({ user_id: req.userId });
     if (existing_restaurant) {
-      return res.status(409).json({ message: "User restaurant already exists." });
+      return res.status(409).json({ message: 'User restaurant already exists.' });
     }
 
-    const imageUrl = await uploadImage(req.file as Express.Multer.File);
+    const image_url = await uploadImage(req.file as Express.Multer.File);
 
     const restaurant = await RestaurantService.createRestaurant({ 
-      ...req.body, 
+      ...body,
       user: new mongoose.Types.ObjectId(req.userId), 
-      imageUrl: imageUrl,
+      imageUrl: image_url,
       lastUpdated: new Date(),
     });
 
-    res.status(201).send(restaurant);
+    return res.status(201).send(restaurant);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Internal Server Error." });
+    console.log('An error occured', error);
+    res.status(500).json({ message: 'Internal Server Error.' });
   }
 };
 
 
-const updateMyRestaurant = async (req: Request, res: Response) => {
+const updateMyRestaurant = async (
+  req: Request<{}, {}, RestaurantType['body']>, 
+  res: Response
+) => {
   try {
     const update_data = req.body;
 
-    if (req.file) {
-      const imageUrl = await uploadImage(req.file as Express.Multer.File);
-      const updated = await RestaurantService.updateRestaurant({ user: req.userId }, { 
-        ...update_data, 
-        imageUrl: imageUrl, 
-        lastUpdated: new Date(), 
-      });
+    const imageUrl = await uploadImage(req.file as Express.Multer.File);
 
-      res.status(200).send(updated);
-    }
+    const updated = await RestaurantService.updateRestaurant({ user: req.userId }, { 
+      ...update_data, 
+      imageUrl: imageUrl, 
+      lastUpdated: new Date(), 
+    });
 
-    const updated = await RestaurantService.updateRestaurant({ user: req.userId }, { ...update_data, lastUpdated: new Date() });
-
-    res.status(200).send(updated);
+    return res.status(200).send(updated);
   } catch (error) {
-    console.log("error", error);
-    res.status(500).json({ message: "Internal Server Error." });
+    console.log('An error occured', error);
+    res.status(500).json({ message: 'Internal Server Error.' });
   }
 };
 
 
 const getMyRestaurantOrders = async (req: Request, res: Response) => {
   try {
-    const restaurant = await RestaurantService.findRestaurant({ user: req.userId });
+    const restaurant = await RestaurantService.findRestaurant({ user_id: req.userId });
     if (!restaurant) {
-      return res.status(404).json({ message: "restaurant not found." });
+      return res.status(404).json({ message: 'restaurant not found.' });
     }
 
     const orders = await OrderService.findRestaurantOrders({ restaurant: String(restaurant._id) });
-    if (!orders) {
-      return res.status(404).send(`You currently don't have any orders.`);
-    }
+    if (!orders) return res.status(404).send(`You currently don't have any orders.`);
 
-    res.json(orders);
+    return res.status(200).json(orders);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Internal Server Error." });
+    console.log('An error occured', error);
+    return res.status(500).json({ message: 'Internal Server Error.' });
   }
 };
 
@@ -93,7 +93,7 @@ const updateOrderStatus = async (req: Request, res: Response) => {
     const { status } = req.body;
 
     const order = await OrderService.findOrderById(orderId);
-    if (!order) return res.status(404).json({ message: "order not found." });
+    if (!order) return res.status(404).json({ message: 'Order not found.' });
 
     const restaurant = await RestaurantService.findById(String(order.restaurant));
     if (restaurant?.user?._id.toString() !== req.userId) {
@@ -101,13 +101,12 @@ const updateOrderStatus = async (req: Request, res: Response) => {
     }
 
     order.status = status;
-
     await order.save();
 
-    res.status(200).json(order);
+    return res.status(200).json(order);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Internal Server Error." });
+    console.log('An error occured', error);
+    return res.status(500).json({ message: 'Internal Server Error.' });
   }
 };
 

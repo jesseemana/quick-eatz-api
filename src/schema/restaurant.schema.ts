@@ -1,5 +1,10 @@
 import { z } from 'zod';
 
+const menuItemSchema = z.object({
+  name: z.string(),
+  price: z.number(),
+});
+
 export const restaurantSchema = z.object({
   params: z.object({
     restaurantId: z.string({ 
@@ -26,13 +31,7 @@ export const restaurantSchema = z.object({
       required_error: 'Delivery price is required' 
     }).min(0, 'Field cannot be less than zero'),
     cuisines: z.array(z.string()),
-    menuItems: z.array(
-      z.object({
-        _id: z.any(),
-        price: z.number({ required_error: 'Menu item price is required' }),
-        name: z.string({ required_error: 'Menu item name is required' })
-      })
-    ),
+    menuItems: z.array(menuItemSchema),
   })
 });
 
