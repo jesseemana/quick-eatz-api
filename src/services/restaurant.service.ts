@@ -6,8 +6,8 @@ const findById = async (id: string) => {
   return restaurant;
 }
 
-const findRestaurant = async ({ user }: { user: string }) => {
-  const restaurant = await Restaurant.findOne({ user });
+const findRestaurant = async ({ user_id }: { user_id: string }) => {
+  const restaurant = await Restaurant.findOne({ user: user_id });
   return restaurant;
 }
 
