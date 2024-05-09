@@ -1,9 +1,25 @@
 import { FilterQuery, UpdateQuery } from 'mongoose';
 import Restaurant, { RestaurantType } from '../models/restaurant';
 
+type SearchProps = { 
+  query: any, 
+  skip: number, 
+  limit: number, 
+  sortOption: string 
+}
+
 const findById = async (id: string) => {
   const restaurant = await Restaurant.findById(id);
   return restaurant;
+}
+
+const search = async ({ query, skip, limit, sortOption }: SearchProps) => {
+  const restaurants = await Restaurant.find(query)
+    .sort({ [sortOption]: 1 })
+    .limit(limit)
+    .skip(skip)
+    .lean();
+  return restaurants;
 }
 
 const findRestaurant = async ({ user_id }: { user_id: string }) => {
@@ -16,6 +32,10 @@ const createRestaurant = async (data: Partial<RestaurantType>) => {
   return restaurant;
 }
 
+async function countRestaurants(query: any) {
+  return await Restaurant.countDocuments(query);
+}
+
 const updateRestaurant = async (
   query: FilterQuery<RestaurantType>, 
   update: UpdateQuery<RestaurantType>
@@ -24,4 +44,11 @@ const updateRestaurant = async (
   return updated;
 }
 
-export default { findById, findRestaurant, createRestaurant, updateRestaurant }
+export default { 
+  search,
+  findById, 
+  findRestaurant, 
+  createRestaurant, 
+  updateRestaurant, 
+  countRestaurants, 
+}
