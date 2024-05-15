@@ -17,4 +17,14 @@ export const checkoutSessionRequest = z.object({
   restaurant_id: z.string(),
 });
 
+export const orderStatusSchema = z.object({
+  params: z.object({
+    orderId: z.string()
+  }),
+  body: z.object({
+    status: z.enum(['placed', 'paid', 'inProgress', 'outForDelivery', 'delivered'])
+  })
+})
+
+export type OrderStatusType = z.infer<typeof orderStatusSchema>;
 export type CheckoutSessionRequestType = z.infer<typeof checkoutSessionRequest>;
