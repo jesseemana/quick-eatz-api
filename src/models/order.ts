@@ -1,10 +1,16 @@
 import mongoose, { InferSchemaType } from 'mongoose';
 
-export type orderType = InferSchemaType<typeof orderSchema>;
+export type OrderType = InferSchemaType<typeof orderSchema>;
 
 const orderSchema = new mongoose.Schema({
-  restaurant: { type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant' },
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  restaurant: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Restaurant' 
+  },
+  user: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User' 
+  },
   deliveryDetails: {
     name: { type: String, required: true },
     city: { type: String, required: true },
@@ -22,10 +28,10 @@ const orderSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ['placed', 'paid', 'inProgress', 'outForDelivery', 'delivered'],
+    required: true,
   },
   createdAt: { type: Date, default: Date.now },
 });
 
 const Order = mongoose.model('Order', orderSchema);
-
 export default Order;
