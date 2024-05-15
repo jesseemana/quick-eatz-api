@@ -5,10 +5,8 @@ import { MenuItemType } from '../models/restaurant';
 import { OrderService, RestaurantService, }from '../services';
 import { CheckoutSessionRequestType } from '../schema/order.schema';
 
-
 const STRIPE = new Stripe(process.env.STRIPE_API_KEY as string);
-const STRIPE_ENDPOINT_SECRET = String(process.env.STRIPE_WEBHOOK_SECRET);
-
+const STRIPE_WEBHOOK_SECRET = String(process.env.STRIPE_WEBHOOK_SECRET);
 
 async function getMyOrders(req: Request, res: Response) {
   try {
@@ -66,7 +64,9 @@ function createLineItems(
   menuItems: MenuItemType[]
 ) {
   const lineItems = checkoutRequest.cartItems.map((cart_item) => {
-    const menu_item = menuItems.find((menu_item) => menu_item._id.toString() === cart_item.menuItemId.toString());
+    const menu_item = menuItems.find(
+      (menu_item) => menu_item._id.toString() === cart_item.menuItemId.toString()
+    );
     if (!menu_item) throw new Error(`Menu item not found: ${cart_item.menuItemId}`);
 
     const line_item: Stripe.Checkout.SessionCreateParams.LineItem = {
@@ -120,12 +120,29 @@ async function createSession(
 }
 
 
-async function stripeWebhookHandler(req: Request, res: Response) { 
+const stripeWebhookHandler = async (req: Request, res: Response) => { 
+  let event;
+
   try {
-  } catch (error) {
+    const sig = req.headers['stripe-signature'];
+    event = STRIPE.webhooks.constructEvent(
+      req.body, 
+      sig as string, 
+      STRIPE_WEBHOOK_SECRET
+    );
+  } catch (error: any) {
     console.log(error);
-    return res.status(500).send('Internal Server Error');
+    return res.status(400).send(`Webhook error: ${error.message}`);
   }
+
+  if (event.type === 'checkout.session.completed') {
+    const order = await OrderService.findOrderById(event.data.object.metadata?.order_id as string);
+    if (!order) return res.status(404).send('Order not found');
+    order.totalAmount = event.data.object.amount_total;
+    await order.save();
+  }
+
+  return res.status(200).send();
 }
 
 
