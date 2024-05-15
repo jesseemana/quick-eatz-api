@@ -1,19 +1,19 @@
 import { Router } from 'express';
 import { validateInput } from '../middleware';
-import { restaurantSchema } from '../schema/restaurant.schema';
+import { searchRestaurant } from '../schema/restaurant.schema';
 import RestaurantController from '../controllers/restaurant.controller';
 
 const router = Router();
 
 router.get(
   '/:restaurantId', 
-  validateInput(restaurantSchema), 
+  validateInput(searchRestaurant), 
   RestaurantController.getRestaurant
 );
 
 router.get(
   '/search/:city', 
-  validateInput(restaurantSchema), 
+  validateInput(searchRestaurant), 
   RestaurantController.searchRestaurant
 );
 

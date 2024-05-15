@@ -9,15 +9,19 @@ const router = Router();
 router.route('/')
   .get([jwtCheck, jwtParse], MyRestaurantController.getMyRestaurant)
   .post(
-    [upload.single('imageFile'), validateInput(restaurantSchema), jwtCheck, jwtParse], 
+    [upload.single('image'), jwtCheck, jwtParse, validateInput(restaurantSchema)], 
     MyRestaurantController.createMyRestaurant
   )
   .put( 
-    [upload.single('imageFile'), validateInput(restaurantSchema), jwtCheck, jwtParse], 
+    [upload.single('image'), jwtCheck, jwtParse, validateInput(restaurantSchema), jwtCheck, jwtParse], 
     MyRestaurantController.updateMyRestaurant
   );
 
-router.get('/orders', [jwtCheck, jwtParse], MyRestaurantController.getMyRestaurantOrders);
+router.get(
+  '/orders', 
+  [jwtCheck, jwtParse],
+  MyRestaurantController.getMyRestaurantOrders
+);
 
 router.patch(
   '/order/:orderId/status', 
