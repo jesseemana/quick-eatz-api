@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import Restaurant from '../models/restaurant';
 import { RestaurantService } from '../services';
-import { RestaurantType } from '../schema/restaurant.schema';
+import { SearchType } from '../schema/restaurant.schema';
 
 
-const getRestaurant = async (
-  req: Request<RestaurantType['params'], {}, {}>, 
+async function getRestaurant(
+  req: Request<SearchType, {}, {}>, 
   res: Response
-) => {
+) {
   try {
     const { restaurantId } = req.params;
 
@@ -22,10 +22,10 @@ const getRestaurant = async (
 };
 
 
-const searchRestaurant = async (
-  req: Request<RestaurantType['params'], {}, {}>, 
+async function searchRestaurant(
+  req: Request<SearchType, {}, {}>, 
   res: Response
-) => {
+) {
   try {
     const { city } = req.params;
 
