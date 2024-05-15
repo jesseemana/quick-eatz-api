@@ -2,29 +2,16 @@ import Stripe from 'stripe';
 import { Request, Response, } from 'express';
 import { MenuItemType } from '../models/restaurant';
 import { OrderService, RestaurantService, }from '../services';
+import { CheckoutSessionRequestType } from '../schema/order.schema';
 
 const STRIPE = new Stripe(process.env.STRIPE_API_KEY as string);
 const STRIPE_ENDPOINT_SECRET = String(process.env.STRIPE_WEBHOOK_SECRET);
 
-type CheckoutSessionRequest = {
-  cartItems: {
-    name: string,
-    quantity: string,
-    menu_item_id: string,
-  }[],
-  deliveryDetails: {
-    email: string,
-    name: string,
-    addressLine1: string,
-    city: string,
-  },
-  restaurant_id: string,
-}
 
 async function getMyOrders(req: Request, res: Response) {
   try {
     const orders = await OrderService.findOrders({ user: req.userId });
-    return res.json(orders);
+    return res.status(200).json(orders);
   } catch (error) {
     console.log(error);
     return res.status(500).send('Internal Server Error');
@@ -32,9 +19,12 @@ async function getMyOrders(req: Request, res: Response) {
 }
 
 
-async function createCheckoutSession(req: Request, res: Response) {
+async function createCheckoutSession(
+  req: Request<{}, {}, CheckoutSessionRequestType>, 
+  res: Response
+) {
   try {
-    const checkoutRequest: CheckoutSessionRequest=req.body;
+    const checkoutRequest = req.body;
 
     const restaurant = await RestaurantService.findById(checkoutRequest.restaurant_id);
     if (!restaurant) return res.status(404).send('Restaurant not found!');
@@ -50,7 +40,7 @@ async function createCheckoutSession(req: Request, res: Response) {
 
     if (!session) return res.status(500).send('Error creating stripe session');
 
-    return res.json({ url: session.url });
+    return res.status(200).json({ url: session.url });
   } catch (error) {
     console.log(error);
     return res.status(500).send('Internal Server Error');
@@ -59,12 +49,12 @@ async function createCheckoutSession(req: Request, res: Response) {
 
 
 function createLineItems(
-  checkoutRequest: CheckoutSessionRequest, 
+  checkoutRequest: CheckoutSessionRequestType, 
   menuItems: MenuItemType[]
 ) {
   const lineItems = checkoutRequest.cartItems.map((cart_item) => {
-    const menu_item = menuItems.find((item) => item._id.toString() === cart_item.menu_item_id.toString());
-    if (!menu_item) throw new Error(`Menu item not found: ${cart_item.menu_item_id}`);
+    const menu_item = menuItems.find((item) => item._id.toString() === cart_item.menuItemId.toString());
+    if (!menu_item) throw new Error(`Menu item not found: ${cart_item.menuItemId}`);
 
     const line_item: Stripe.Checkout.SessionCreateParams.LineItem = {
       price_data: {
