@@ -35,7 +35,7 @@ const jwtParse = async (req: Request, res: Response, next: NextFunction) => {
     const user = await UserService.findUser({ auth0Id });
     if (!user) return res.sendStatus(401);
 
-    req.user = user.toJSON();
+    req.user = user.toObject();
     req.auth0Id = auth0Id as string;
     req.userId = user._id.toString();
     next();
