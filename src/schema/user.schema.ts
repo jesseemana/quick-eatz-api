@@ -1,31 +1,28 @@
-import { object, z } from 'zod';
+import { z } from 'zod';
 
-export const userSchema = object({
-  name: z.string({ 
-    required_error: 'name is required' 
-  })
-    .min(3, 'name must be at least 3 characters long')
-    .max(30, 'name cannot be more than 30 characters long')
-    .optional(),
-  city: z.string({ 
-    required_error: 'city is required' 
-  }).optional(),
-  country: z.string({ 
-    required_error: 'country is required' 
-  }).optional(),
-  addressLine1: z.string({ 
-    required_error: 'address line is required' 
-  }).optional(),
-  email: z.string({ 
-    required_error: 'email is required' 
-  })
-    .email('enter a valid email')
-    .toLowerCase()
-    .trim()
-    .optional(),
-  auth0Id: z.string({ 
-    required_error: 'auth0Id is required' 
-  }).optional(),
+export const userSchema = z.object({
+  body: z.object({
+    auth0Id: z.string().optional(),
+    email: z.string().email('enter a valid email')
+      .toLowerCase()
+      .trim()
+      .optional(),
+    name: z.string()
+      .min(3, 'name cannot be less than 3 characters')
+      .max(48, 'name cannot be more than 48 characters long')
+      .optional(),
+    city: z.string()
+      .min(5, 'city cannot be less than 5 characters')
+      .max(20, 'city cannot be more than 20 characters long')
+      .optional(),
+    country: z.string()
+      .min(4, 'country cannot be less than 4 characters')
+      .max(20, 'country cannot be more than 20 characters long').optional(),
+    addressLine1: z.string()
+      .min(5, 'addressLine1 cannot be less than 5 characters')
+      .max(20, 'addressLine1 cannot be more than 20 characters long')
+      .optional(),
+  }),
 });
 
-export type UserType = z.infer<typeof userSchema>;
+export type UserType = z.infer<typeof userSchema>['body'];
