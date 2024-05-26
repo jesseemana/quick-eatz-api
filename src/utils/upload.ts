@@ -12,9 +12,12 @@ async function uploadImage(file: Express.Multer.File) {
     const base64Image = Buffer.from(image.buffer).toString('base64');
     const dataURI = `data:${image.mimetype};base64,${base64Image}`;
     const uploadResponse = await cloudinary.uploader.upload(dataURI);
-    return uploadResponse.url;
+    return {
+      image: uploadResponse.url,
+      coudinary_id: uploadResponse.public_id
+    };
   } catch (error) {
-    console.log(`Error occured while uploading picture: ${error}`);
+    console.log(`Error occured while uploading picture:`, error);
   }
 };
 

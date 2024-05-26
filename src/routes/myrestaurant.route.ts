@@ -9,11 +9,11 @@ const router = Router();
 router.route('/')
   .get([jwtCheck, jwtParse], MyRestaurantController.getMyRestaurant)
   .post(
-    [upload.single('image'), jwtCheck, jwtParse, validateInput(restaurantSchema)], 
+    jwtCheck, jwtParse, [upload.single('image'), validateInput(restaurantSchema)], 
     MyRestaurantController.createMyRestaurant
   )
   .put( 
-    [upload.single('image'), jwtCheck, jwtParse, validateInput(restaurantSchema), jwtCheck, jwtParse], 
+    [jwtCheck, jwtParse, upload.single('image'), validateInput(restaurantSchema)], 
     MyRestaurantController.updateMyRestaurant
   );
 

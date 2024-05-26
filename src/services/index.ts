@@ -1,5 +1,6 @@
-import OrderService from './order.service';
-import RestaurantService from './restaurant.service';
 import UserService from './user.service';
+import OrderService from './order.service';
+import FavoriteService from './favorite.service';
+import RestaurantService from './restaurant.service';
 
-export { OrderService, RestaurantService, UserService, }
+export { OrderService, RestaurantService, UserService, FavoriteService, }

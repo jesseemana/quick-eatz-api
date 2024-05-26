@@ -5,9 +5,9 @@
   "main": "./src/server.ts",
   "scripts": {
     "build": "tsc",
-    "dev": "concurrently \"nodemon\" \"npm run stripe\"",
+    "dev": "nodemon",
     "start": "node build/server.js",
-    "stripe": "stripe listen --forward-to localhost:7000/api/order/checkout/webhook"
+    "stripe": "stripe listen --forward-to localhost:3001/api/order/checkout/webhook"
   },
   "keywords": [],
   "author": "",
