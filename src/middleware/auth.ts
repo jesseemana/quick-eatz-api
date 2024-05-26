@@ -23,7 +23,7 @@ const jwtParse = async (req: Request, res: Response, next: NextFunction) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res.sendStatus(401);
+    return res.status(401).json({ msg: 'Unauthorized' });
   }
 
   const token = authorization.split(' ')[1].trim();
@@ -33,14 +33,14 @@ const jwtParse = async (req: Request, res: Response, next: NextFunction) => {
     const auth0Id = decoded.sub as string;
 
     const user = await UserService.findUser({ auth0Id });
-    if (!user) return res.sendStatus(401);
+    if (!user) return res.status(401).json({ msg: 'Unauthorized' });
 
     req.user = user.toObject();
     req.auth0Id = auth0Id as string;
     req.userId = user._id.toString();
     next();
   } catch (error) {
-    return res.sendStatus(401);
+    return res.status(401).json({ msg: 'Unauthorized' });
   }
 };
 

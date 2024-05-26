@@ -8,7 +8,7 @@ import { OrderService, RestaurantService } from '../services';
 
 async function getMyRestaurant(req: Request, res: Response) {
   try {
-    const restaurant = await RestaurantService.findRestaurant({ user_id: req.userId });
+    const restaurant = await RestaurantService.findRestaurant(req.userId);
     if (!restaurant) return res.status(404).send('Restaurant not found.'); 
     return res.status(200).json(restaurant);
   } catch (error) {
@@ -25,7 +25,7 @@ async function createMyRestaurant(
   try {
     const body = req.body;
     
-    const existing_restaurant = await RestaurantService.findRestaurant({ user_id: req.userId });
+    const existing_restaurant = await RestaurantService.findRestaurant(req.userId);
     if (existing_restaurant) {
       return res.status(409).send('User restaurant already exists.');
     }
@@ -75,12 +75,10 @@ async function updateMyRestaurant(
 
 async function getMyRestaurantOrders(req: Request, res: Response) {
   try {
-    const restaurant = await RestaurantService.findRestaurant({ user_id: req.userId });
-    if (!restaurant) {
-      return res.status(404).send('Restaurant not found.');
-    }
+    const restaurant = await RestaurantService.findRestaurant(req.userId);
+    if (!restaurant) return res.status(404).send('Restaurant not found.');
 
-    const orders = await OrderService.findRestaurantOrders({ restaurant: String(restaurant._id) });
+    const orders = await OrderService.findRestaurantOrders(restaurant._id.toString());
     if (!orders) {
       return res.status(404).send(`You currently don't have any orders.`);
     }

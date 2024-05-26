@@ -6,11 +6,11 @@ import { OrderService, RestaurantService, }from '../services';
 import { CheckoutSessionRequestType } from '../schema/order.schema';
 
 const STRIPE = new Stripe(process.env.STRIPE_API_KEY as string);
-const STRIPE_WEBHOOK_SECRET = String(process.env.STRIPE_WEBHOOK_SECRET);
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET as string;
 
 async function getMyOrders(req: Request, res: Response) {
   try {
-    const orders = await OrderService.findOrders({ user: req.userId });
+    const orders = await OrderService.getMyOrders(req.userId);
     return res.status(200).json(orders);
   } catch (error) {
     console.log(error);

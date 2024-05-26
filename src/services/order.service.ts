@@ -1,18 +1,22 @@
-import Order from '../models/order';
+import Order, { OrderType } from '../models/order';
 
-const createOrder = async (data: any) => {
-  const new_order = new Order(data)
+const createOrder = async (data: OrderType) => {
+  const new_order = new Order(data);
   return new_order;
 }
 
-const findOrders = async ({ user }: { user: string }) => {
-  const order = await Order.find({ user }).populate('restaurant').populate('user');
-  return order;
+const getMyOrders = async (user_id: string) => {
+  const orders = await Order.find({ user: user_id })
+    .populate('restaurant')
+    .populate('user');
+  return orders;
 }
 
-const findRestaurantOrders = async ({ restaurant }: { restaurant: string }) => {
-  const order = await Order.find({ restaurant }).populate('restaurant').populate('user');
-  return order;
+const findRestaurantOrders = async (restaurant_id: string) => {
+  const orders = await Order.find({ restaurant: restaurant_id })
+    .populate('restaurant')
+    .populate('user');
+  return orders;
 }
 
 const findOrderById = async (id: string) => {
@@ -20,4 +24,9 @@ const findOrderById = async (id: string) => {
   return order;
 }
 
-export default { createOrder, findOrders, findOrderById, findRestaurantOrders, }
+export default { 
+  findOrderById, 
+  createOrder, 
+  getMyOrders, 
+  findRestaurantOrders, 
+}
