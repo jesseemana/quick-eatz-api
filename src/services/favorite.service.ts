@@ -2,8 +2,7 @@ import Favorite, { FavoriteModelType } from '../models/favorites';
 
 async function findFavorite({ user, restaurant }: FavoriteModelType) {
   const favorited = await Favorite.findOne({ user, restaurant });
-  if (favorited) return true;
-  return false;
+  return favorited;
 }
 
 async function createFave(data: FavoriteModelType) {

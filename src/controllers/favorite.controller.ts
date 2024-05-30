@@ -18,9 +18,12 @@ async function checkFavorite(
       user: new mongoose.Types.ObjectId(user_id), 
       restaurant: restaurant._id, 
     });
-    if (!isBookmarked) return res.status(404).json({ favorited: false });
+    if (!isBookmarked) return res.status(404).json({ msg: 'Restaurant is not bookmarked' });
 
-    return res.status(200).json({ favorited: true });
+    return res.status(200).json({ 
+      msg: 'Restaurant is bookmarked', 
+      data: isBookmarked,  
+    });
   } catch (error) {
     return res.status(500).send('Internal Server Error');
   }
@@ -44,7 +47,7 @@ async function addFavorite(
 
     if (!favorite) return res.status(400).send({ msg: 'Failed to add to favorites' });
 
-    return res.status(200).send({ msg: 'Added to favorites' });
+    return res.status(201).send({ msg: 'Added to favorites' });
   } catch (error) {
     return res.status(500).send('Internal Server Error');
   }
