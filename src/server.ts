@@ -10,6 +10,7 @@ import {
 import cors from 'cors';
 import ConnectDB from './utils/database';
 import { allowedOrigins } from './constants';
+import log from './utils/logger';
 
 const app = express();
 const PORT = parseInt(process.env.PORT as string) || 3001;
@@ -31,4 +32,4 @@ app.use('/api/favorite', FavoriteRoute);
 app.use('/api/restaurant', RestaurantRoute);
 app.use('/api/my/restaurant', MyRestaurantRoute);
 
-app.listen(PORT, () => console.log(`server started on http://localhost:${PORT}`));
+app.listen(PORT, () => log.info(`server started on http://localhost:${PORT}`));
