@@ -14,7 +14,7 @@ import { allowedOrigins } from './constants';
 const app = express();
 const PORT = parseInt(process.env.PORT as string) || 3001;
 
-// ConnectDB();
+ConnectDB();
 
 // TODO: create cors allowed origins list
 app.use(cors({ origin: [...allowedOrigins] })); 
