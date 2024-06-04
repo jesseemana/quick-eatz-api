@@ -38,8 +38,7 @@ function main() {
 
   function gracefulShutdown(signal: string) {
     process.on(signal, () => {
-      log.info('Received signal', signal);
-      log.info('Shutting down server...');
+      log.info(`Received signal: ${signal}, shutting down server...`);
       server.close();
       database.disconnect();
       log.info('Goodbye...😥💤💤');

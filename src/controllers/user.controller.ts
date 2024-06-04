@@ -9,7 +9,7 @@ async function getCurrentUser(req: Request, res: Response) {
     if (!currentUser) return res.status(404).send('No user found.');
     return res.status(200).json(currentUser);
   } catch (error) {
-    console.log('An error occurred:', error);
+    console.log(`An error occurred: ${error}`);
     return res.status(500).send(`Internal Server Error`);
   }
 };
@@ -29,7 +29,7 @@ async function registerUser(
 
     return res.status(201).json(newUser.toObject());
   } catch (error) {
-    console.log('An error occurred:', error);
+    console.log(`An error occurred: ${error}`);
     return res.status(500).send(`Internal Server Error`);
   }
 };
@@ -51,7 +51,7 @@ async function updateCurrentUser(
 
     return res.status(400).send('Failed to update user');
   } catch (error) {
-    console.log('An error occurred:', error);
+    console.log(`An error occurred: ${error}`);
     return res.status(500).send(`Internal Server Error`);
   }
 };

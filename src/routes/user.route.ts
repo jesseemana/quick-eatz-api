@@ -6,6 +6,7 @@ import { userSchema } from '../schema/user.schema';
 const router = Router();
 
 router.route('/')
+  .post(jwtCheck, MyUserController.registerUser)
   .get(
     [jwtCheck, jwtParse, validateInput(userSchema)], 
     MyUserController.getCurrentUser
@@ -14,6 +15,5 @@ router.route('/')
     [jwtCheck, jwtParse, validateInput(userSchema)], 
     MyUserController.updateCurrentUser
   )
-  .post(jwtCheck, MyUserController.registerUser);
 
 export default router;

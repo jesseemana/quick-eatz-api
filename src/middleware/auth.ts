@@ -33,7 +33,7 @@ const jwtParse = async (req: Request, res: Response, next: NextFunction) => {
     const auth0Id = decoded.sub as string;
 
     const user = await UserService.findUser({ auth0Id });
-    if (!user) return res.status(401).json({ msg: 'Unauthorized' });
+    if (!user) return res.status(401).json({ msg: 'User not found' });
 
     req.user = user.toObject();
     req.auth0Id = auth0Id as string;
