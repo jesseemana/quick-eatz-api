@@ -24,6 +24,14 @@ export const restaurantSchema = z.object({
       required_error: 'delivery price is required', 
       invalid_type_error: 'must be a valid number'
     }),
+    deliveryMin: z.coerce.number({ 
+      required_error: 'delivery time min is required', 
+      invalid_type_error: 'must be a valid number'
+    }),
+    deliveryMax: z.coerce.number({ 
+      required_error: 'delivery time max is required', 
+      invalid_type_error: 'must be a valid number'
+    }),
     estimatedDeliveryTime: z.coerce.number({ 
       required_error: 'delivery price is required', 
       invalid_type_error: 'must be avlid number', 
