@@ -21,11 +21,14 @@ const restaurantSchema = new mongoose.Schema({
   city: { type: String, required: true },
   country: { type: String, required: true },
   deliveryPrice: { type: Number, required: true },
+  deliveryMin: { type: Number, required: true },
+  deliveryMax: { type: Number, required: true },
   restaurantName: { type: String, required: true },
   estimatedDeliveryTime: { type: Number, required: true },
   cuisines: [{ type: String, required: true }],
   menuItems: [menuItemSchema],
-  imageUrl: { type: String, required: true },
+  thumbNail: { type: String, required: true },
+  image: { type: String, required: true },
   lastUpdated: { type: Date, required: true, },
 });
 
