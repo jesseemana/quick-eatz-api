@@ -9,11 +9,27 @@ const router = Router();
 router.route('/')
   .get([jwtCheck, jwtParse], MyRestaurantController.getMyRestaurant)
   .post(
-    jwtCheck, jwtParse, [upload.single('image'), validateInput(restaurantSchema)], 
+    [
+      jwtCheck, 
+      jwtParse,
+      upload.fields([
+        { name: 'imageFile', maxCount: 1 }, 
+        { name: 'thumbNailFile', maxCount: 1 }
+      ]), 
+      validateInput(restaurantSchema)
+    ], 
     MyRestaurantController.createMyRestaurant
   )
   .put( 
-    [jwtCheck, jwtParse, upload.single('image'), validateInput(restaurantSchema)], 
+    [
+      jwtCheck, 
+      jwtParse, 
+      upload.fields([
+        { name: 'imageFile', maxCount: 1 }, 
+        { name: 'thumbNailFile', maxCount: 1 }
+      ]), 
+      validateInput(restaurantSchema)
+    ], 
     MyRestaurantController.updateMyRestaurant
   );
 

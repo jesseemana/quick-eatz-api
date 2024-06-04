@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
-import uploadImage from '../utils/upload';
+import { log, uploadImage } from '../utils';
 import { OrderStatusType } from '../schema/order.schema';
 import { RestaurantType } from '../schema/restaurant.schema';
 import { OrderService, RestaurantService } from '../services';
@@ -12,7 +12,7 @@ async function getMyRestaurant(req: Request, res: Response) {
     if (!restaurant) return res.status(404).send('Restaurant not found.'); 
     return res.status(200).json(restaurant);
   } catch (error) {
-    console.log('An error occured', error);
+    log.error('An error occured', error);
     return res.status(500).send('Internal Server Error');
   }
 };
@@ -24,26 +24,33 @@ async function createMyRestaurant(
 ) {
   try {
     const body = req.body;
-    
-    const existing_restaurant = await RestaurantService.findRestaurant(req.userId);
-    if (existing_restaurant) {
-      return res.status(409).send('User restaurant already exists.');
-    }
+    // @ts-ignore
+    const [image, thumbNail] = Object.values(req.files).map(files => files[0])
 
-    const response = await uploadImage(req.file as Express.Multer.File);
-    if (!response) return res.status(400).send('Failed to upload image')
+    const existingRestaurant = await RestaurantService.findRestaurant(req.userId);
+    if (existingRestaurant) 
+      return res.status(409).send('User restaurant already exists.');
+
+    const [imageResponse, thumbNailResponse] = await Promise.all([
+      uploadImage(image),
+      uploadImage(thumbNail),
+    ]);
+
+    if (!imageResponse || !thumbNailResponse) 
+      return res.status(400).send('Failed to upload image');
 
     const restaurant = await RestaurantService.createRestaurant({ 
       ...body,
-      menuItems: new mongoose.Types.DocumentArray(body.menuItems),
       user: new mongoose.Types.ObjectId(req.userId), 
-      imageUrl: response.image,
+      menuItems: new mongoose.Types.DocumentArray(body.menuItems),
+      image: imageResponse.image,
+      thumbNail: thumbNailResponse.image,
       lastUpdated: new Date(),
     });
 
     return res.status(201).json(restaurant);
   } catch (error) {
-    console.log('An error occured', error);
+    log.error('An error occured', error);
     return res.status(500).send('Internal Server Error');
   }
 };
@@ -54,20 +61,28 @@ async function updateMyRestaurant(
   res: Response
 ) {
   try {
-    const update_data = req.body;
+    const updateData = req.body;
+    // @ts-ignore
+    const [image, thumbNail] = Object.values(req.files).map(files => files[0])
 
-    const response = await uploadImage(req.file as Express.Multer.File);
-    if (!response) return res.status(400).send('Error uploading image');
+    const [imageResponse, thumbNailResponse] = await Promise.all([
+      uploadImage(image),
+      uploadImage(thumbNail),
+    ]);
+
+    if (!imageResponse || !thumbNailResponse) 
+      return res.status(400).send('Failed to upload image');
 
     const updated = await RestaurantService.updateRestaurant({ user: req.userId }, { 
-      ...update_data, 
-      imageUrl: response.image, 
+      ...updateData, 
+      image: imageResponse.image, 
+      thumbNail: thumbNailResponse.image,
       lastUpdated: new Date(), 
     });
 
     return res.status(200).json(updated);
   } catch (error) {
-    console.log('An error occured', error);
+    log.error('An error occured', error);
     return res.status(500).send('Internal Server Error');
   }
 };
@@ -85,7 +100,7 @@ async function getMyRestaurantOrders(req: Request, res: Response) {
 
     return res.status(200).json(orders);
   } catch (error) {
-    console.log('An error occured', error);
+    log.error('An error occured', error);
     return res.status(500).send('Internal Server Error');
   }
 };
@@ -112,7 +127,7 @@ async function updateOrderStatus(
 
     return res.status(200).json(order);
   } catch (error) {
-    console.log('An error occured', error);
+    log.error('An error occured', error);
     return res.status(500).send('Internal Server Error');
   }
 };
