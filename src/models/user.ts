@@ -14,6 +14,7 @@ const userSchema = new Schema({
     required: true, 
   },
   name: { type: String, },
+  phone: { type: String, },
   city: { type: String, },
   country: { type: String, },
   addressLine1: { type: String, },
