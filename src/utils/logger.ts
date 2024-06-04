@@ -5,12 +5,12 @@ const level = 'info';
 
 const log = pino({
   level,
-  // transport: {
-  //   target: 'pino-pretty',
-  //   options: {
-  //     colorize: true,
-  //   },
-  // },
+  transport: {
+    target: 'pino-pretty',
+    options: {
+      colorize: true,
+    },
+  },
   base: {
     pid: false,
   },
