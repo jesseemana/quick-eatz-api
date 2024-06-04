@@ -23,7 +23,6 @@ async function createMyRestaurant(
   res: Response
 ) {
   try {
-    const body = req.body;
     // @ts-ignore
     const [image, thumbNail] = Object.values(req.files).map(files => files[0])
 
@@ -40,9 +39,9 @@ async function createMyRestaurant(
       return res.status(400).send('Failed to upload image');
 
     const restaurant = await RestaurantService.createRestaurant({ 
-      ...body,
+      ...req.body,
       user: new mongoose.Types.ObjectId(req.userId), 
-      menuItems: new mongoose.Types.DocumentArray(body.menuItems),
+      menuItems: new mongoose.Types.DocumentArray(req.body.menuItems),
       image: imageResponse.image,
       thumbNail: thumbNailResponse.image,
       lastUpdated: new Date(),
@@ -61,7 +60,6 @@ async function updateMyRestaurant(
   res: Response
 ) {
   try {
-    const updateData = req.body;
     // @ts-ignore
     const [image, thumbNail] = Object.values(req.files).map(files => files[0])
 
@@ -74,7 +72,7 @@ async function updateMyRestaurant(
       return res.status(400).send('Failed to upload image');
 
     const updated = await RestaurantService.updateRestaurant({ user: req.userId }, { 
-      ...updateData, 
+      ...req.body, 
       image: imageResponse.image, 
       thumbNail: thumbNailResponse.image,
       lastUpdated: new Date(), 
