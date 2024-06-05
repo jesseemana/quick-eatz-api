@@ -2,8 +2,9 @@ import Stripe from 'stripe';
 import mongoose from 'mongoose';
 import { Request, Response, } from 'express';
 import { MenuItemType } from '../models/restaurant';
-import { OrderService, RestaurantService, }from '../services';
+import { OrderService, RestaurantService, UserService, }from '../services';
 import { CheckoutSessionRequestType } from '../schema/order.schema';
+import { log } from '../utils';
 
 const STRIPE = new Stripe(process.env.STRIPE_API_KEY as string);
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET as string;
@@ -11,87 +12,85 @@ const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET as string;
 async function getMyOrders(req: Request, res: Response) {
   try {
     const orders = await OrderService.getMyOrders(req.userId);
+    if (!orders) {
+      return res.status(404).json({ msg: `You currently don't have any orders` });
+    }
     return res.status(200).json(orders);
   } catch (error) {
-    console.log(error);
+    log.error(`An error occurred, ${error}`);
     return res.status(500).send('Internal Server Error');
   }
 }
-
 
 async function createCheckoutSession(
   req: Request<{}, {}, CheckoutSessionRequestType>, 
   res: Response
 ) {
   try {
-    const checkoutRequest = req.body;
+    const checkout_request = req.body;
     
-    const restaurant = await RestaurantService.findById(checkoutRequest.restaurant_id);
+    const user = await UserService.findById(req.userId);
+    if (!user) return res.status(404).send('User not found!');
+    const restaurant = await RestaurantService.findRestauntById(checkout_request.restaurant_id);
     if (!restaurant) return res.status(404).send('Restaurant not found!');
 
-    const new_order = await OrderService.createOrder({
+    const newOrder = await OrderService.createOrder({
       restaurant: restaurant._id, 
       user: new mongoose.Types.ObjectId(req.userId), 
       status: 'placed', 
-      deliveryDetails: checkoutRequest.deliveryDetails, 
-      cartItems: new mongoose.Types.DocumentArray(checkoutRequest.cartItems), 
+      deliveryDetails: checkout_request.deliveryDetails, 
+      cartItems: new mongoose.Types.DocumentArray(checkout_request.cartItems), 
       createdAt: new Date(), 
     });
     
-    const lineItems = createLineItems(checkoutRequest, restaurant.menuItems);
+    const lineItems = createLineItems(checkout_request, restaurant.menuItems);
 
-    const session = await createSession(
-      lineItems, 
-      new_order._id.toString(), 
-      restaurant.deliveryPrice, 
-      restaurant._id.toString()
-    );
-
+    const session = await createSession(lineItems, newOrder._id.toString(), restaurant.deliveryPrice as number, restaurant._id.toString());
     if (!session) return res.status(500).send('Error creating stripe session');
 
-    // save order in db after it's successfully created in stripe
-    await new_order.save(); 
+    // send order confirmation email to user
+    
+    // only save order in db after it's successfully created in stripe
+    await newOrder.save(); 
     return res.status(200).json({ url: session.url });
   } catch (error) {
-    console.log(error);
+    log.error(`An error occurred, ${error}`);
     return res.status(500).send('Internal Server Error');
   }
 }
-
 
 function createLineItems(
   checkoutRequest: CheckoutSessionRequestType, 
   menuItems: MenuItemType[]
 ) {
-  const lineItems = checkoutRequest.cartItems.map((cart_item) => {
-    const menu_item = menuItems.find(
-      (menu_item) => menu_item._id.toString() === cart_item.menuItemId.toString()
+  const lineItems = checkoutRequest.cartItems.map((cartItem) => {
+    const menuItem = menuItems.find(
+      (menuItem) => menuItem._id.toString() === cartItem.menuItemId.toString()
     );
-    if (!menu_item) throw new Error(`Menu item not found: ${cart_item.menuItemId}`);
+    if (!menuItem) throw new Error(`Menu item not found: ${cartItem.menuItemId}`);
 
-    const line_item: Stripe.Checkout.SessionCreateParams.LineItem = {
+    const lineItem: Stripe.Checkout.SessionCreateParams.LineItem = {
       price_data: {
         currency: 'mwk',
-        unit_amount: menu_item.price,
+        unit_amount: menuItem.price,
         product_data: {
-          name: menu_item.name,
+          name: menuItem.name,
         }
       },
-      quantity: cart_item.quantity,
+      quantity: cartItem.quantity,
     }
     
-    return line_item;
+    return lineItem;
   });
 
   return lineItems;
 }
 
-
 async function createSession(
   lineItems: Stripe.Checkout.SessionCreateParams.LineItem[], 
-  order_id: string, 
+  orderId: string, 
   deliveryPrice: number, 
-  restaurant_id: string
+  restaurantId: string
 ) {
   const sessionData = await STRIPE.checkout.sessions.create({
     line_items: lineItems,
@@ -109,16 +108,15 @@ async function createSession(
     ],
     mode: 'payment',
     metadata: {
-      order_id,
-      restaurant_id,
+      orderId,
+      restaurantId,
     },
     success_url: `${process.env.FRONTEND_URL}/order-status?success=true`,
-    cancel_url: `${process.env.FRONTEND_URL}/restaurant/${restaurant_id}?cancelled=true`,
+    cancel_url: `${process.env.FRONTEND_URL}/restaurant/${restaurantId}?cancelled=true`,
   });
 
   return sessionData;
 }
-
 
 const stripeWebhookHandler = async (req: Request, res: Response) => { 
   let event;
@@ -131,12 +129,12 @@ const stripeWebhookHandler = async (req: Request, res: Response) => {
       STRIPE_WEBHOOK_SECRET
     );
   } catch (error: any) {
-    console.log(error);
+    log.error(`An error occurred, ${error}`);
     return res.status(400).send(`Webhook error: ${error.message}`);
   }
 
   if (event.type === 'checkout.session.completed') {
-    const order = await OrderService.findOrderById(event.data.object.metadata?.order_id as string);
+    const order = await OrderService.findOrderById(event.data.object.metadata?.orderId as string);
     if (!order) return res.status(404).send('Order not found');
     order.totalAmount = event.data.object.amount_total;
     await order.save();
@@ -145,9 +143,4 @@ const stripeWebhookHandler = async (req: Request, res: Response) => {
   return res.status(200).send();
 }
 
-
-export default {
-  createCheckoutSession,
-  getMyOrders,
-  stripeWebhookHandler,
-};
+export default { createCheckoutSession, getMyOrders, stripeWebhookHandler, };
