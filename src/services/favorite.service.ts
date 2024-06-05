@@ -1,8 +1,13 @@
 import Favorite, { FavoriteModelType } from '../models/favorites';
 
+async function getUserFavorites(user: string) {
+  const favorites = await Favorite.find({ user });
+  return favorites;
+}
+
 async function findFavorite({ user, restaurant }: FavoriteModelType) {
-  const favorited = await Favorite.findOne({ user, restaurant });
-  return favorited;
+  const favorite = await Favorite.findOne({ user, restaurant });
+  return favorite;
 }
 
 async function createFave(data: FavoriteModelType) {
@@ -13,8 +18,8 @@ async function createFave(data: FavoriteModelType) {
 async function removeFave({ user, restaurant }: FavoriteModelType) {
   const bookmark = await Favorite.findOne({ user, restaurant });
   if (!bookmark) return false;
-  bookmark.deleteOne();
+  await bookmark.deleteOne();
   return true;
 }
 
-export default { findFavorite, createFave, removeFave }
+export default { findFavorite, createFave, removeFave, getUserFavorites }

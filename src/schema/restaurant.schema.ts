@@ -48,10 +48,10 @@ export const searchRestaurant = z.object({
   params: z.object({
     restaurantId: z.string({ 
       required_error: 'restaurant id is required' 
-    }),
+    }).optional(),
     city: z.string({ 
       required_error: 'city is required' 
-    }),
+    }).optional(),
   }),
 });
 

@@ -1,23 +1,26 @@
 import { Router } from 'express';
-import { favoriteSchema } from '../schema/favorite.schema';
 import { jwtCheck, jwtParse, validateInput } from '../middleware';
-import FavoriteController from '../controllers/favorite.controller';
+import { searchRestaurant } from '../schema/restaurant.schema';
+import FavoritesController from '../controllers/favorite.controller';
 
 const router = Router();
 
-router.route('/:restuarantId')
+router.get('/', jwtCheck, jwtParse, FavoritesController.getAll);
+
+router.get('/user', jwtCheck, jwtParse, FavoritesController.getUserBookmarks);
+
+router.route('/:restaurantId')
   .get(
-    [jwtCheck, jwtParse, validateInput(favoriteSchema)], 
-    FavoriteController.checkFavorite
+    [jwtCheck, jwtParse, validateInput(searchRestaurant)], 
+    FavoritesController.checkFavorite
   )
   .post(
-    [jwtCheck, jwtParse, validateInput(favoriteSchema)], 
-    FavoriteController.addFavorite
+    [jwtCheck, jwtParse, validateInput(searchRestaurant)], 
+    FavoritesController.addFavorite
   )
   .delete(
-    [jwtCheck, jwtParse, validateInput(favoriteSchema)], 
-    FavoriteController.deleteFavorite
+    [jwtCheck, jwtParse, validateInput(searchRestaurant)], 
+    FavoritesController.deleteFavorite
   );
 
 export default router;
-
