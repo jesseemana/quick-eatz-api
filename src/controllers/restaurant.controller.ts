@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
-import Restaurant from '../models/restaurant';
 import { RestaurantService } from '../services';
 import { SearchType } from '../schema/restaurant.schema';
-
+import { log } from '../utils';
 
 async function getRestaurant(
   req: Request<SearchType, {}, {}>, 
@@ -11,16 +10,15 @@ async function getRestaurant(
   try {
     const { restaurantId } = req.params;
 
-    const restaurant = await Restaurant.findById(restaurantId);
+    const restaurant = await RestaurantService.findRestauntById(restaurantId as string);
     if (!restaurant) return res.status(404).json({ message: 'restaurant not found' });
 
     return res.status(200).send(restaurant);
   } catch (error) {
-    console.log('An error occured', error);
+    log.error(`An error occurred, ${error}`);
     res.status(500).json({ message: 'Internal Server Error!' });
   }
 };
-
 
 async function searchRestaurant(
   req: Request<SearchType, {}, {}>, 
@@ -41,7 +39,7 @@ async function searchRestaurant(
 
     let query: any = {};
 
-    query['city'] = new RegExp(city, 'i');
+    query['city'] = new RegExp(city as string, 'i');
     const city_check = await RestaurantService.countRestaurants(query);
     if (city_check === 0) {
       return res.status(404).json({
@@ -67,7 +65,7 @@ async function searchRestaurant(
       ];
     }
 
-    const restaurants = await RestaurantService.search({ limit, skip, query, sortOption });
+    const restaurants = await RestaurantService.searchRestaurant({ limit, skip, query, sortOption });
 
     const total = await RestaurantService.countRestaurants(query);
 
@@ -80,13 +78,9 @@ async function searchRestaurant(
       },
     });
   } catch (error) {
-    console.log('An error occured', error);
+    log.error(`An error occurred, ${error}`);
     return res.status(500).send('Internal Server Error!');
   }
 };
 
-
-export default {
-  getRestaurant,
-  searchRestaurant,
-};
+export default { getRestaurant, searchRestaurant, };

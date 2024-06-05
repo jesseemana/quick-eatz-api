@@ -9,11 +9,11 @@ import { OrderService, RestaurantService } from '../services';
 async function getMyRestaurant(req: Request, res: Response) {
   try {
     const restaurant = await RestaurantService.findRestaurant(req.userId);
-    if (!restaurant) return res.status(404).send('Restaurant not found.'); 
+    if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found.' }); 
     return res.status(200).json(restaurant);
   } catch (error) {
     log.error(`An error occurred, ${error}`);
-    return res.status(500).send('Internal Server Error');
+    return res.status(500).json({ msg: 'Internal Server Error' });
   }
 };
 
@@ -28,7 +28,7 @@ async function createMyRestaurant(
 
     const existingRestaurant = await RestaurantService.findRestaurant(req.userId);
     if (existingRestaurant) 
-      return res.status(409).send('User restaurant already exists.');
+      return res.status(409).json({ msg: 'User restaurant already exists.' });
 
     const [imageResponse, thumbNailResponse] = await Promise.all([
       uploadImage(image),
@@ -36,7 +36,7 @@ async function createMyRestaurant(
     ]);
 
     if (!imageResponse || !thumbNailResponse) 
-      return res.status(400).send('Failed to upload image');
+      return res.status(400).json({ msg: 'Failed to upload image' });
 
     const restaurant = await RestaurantService.createRestaurant({ 
       ...req.body,
@@ -50,7 +50,7 @@ async function createMyRestaurant(
     return res.status(201).json(restaurant);
   } catch (error) {
     log.error(`An error occurred, ${error}`);
-    return res.status(500).send('Internal Server Error');
+    return res.status(500).json({ msg: 'Internal Server Error' });
   }
 };
 
@@ -69,7 +69,7 @@ async function updateMyRestaurant(
     ]);
 
     if (!imageResponse || !thumbNailResponse) 
-      return res.status(400).send('Failed to upload image');
+      return res.status(400).json({ msg: 'Failed to upload image' });
 
     const updated = await RestaurantService.updateRestaurant({ user: req.userId }, { 
       ...req.body, 
@@ -82,7 +82,7 @@ async function updateMyRestaurant(
     return res.status(200).json(updated);
   } catch (error) {
     log.error(`An error occurred, ${error}`);
-    return res.status(500).send('Internal Server Error');
+    return res.status(500).json({ msg: 'Internal Server Error' });
   }
 };
 
@@ -90,17 +90,17 @@ async function updateMyRestaurant(
 async function getMyRestaurantOrders(req: Request, res: Response) {
   try {
     const restaurant = await RestaurantService.findRestaurant(req.userId);
-    if (!restaurant) return res.status(404).send('Restaurant not found.');
+    if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found.' });
 
     const orders = await OrderService.findRestaurantOrders(restaurant._id.toString());
     if (!orders) {
-      return res.status(404).send(`You currently don't have any orders.`);
+      return res.status(404).json({ msg: `You currently don't have any orders.` });
     }
 
     return res.status(200).json(orders);
   } catch (error) {
     log.error(`An error occurred, ${error}`);
-    return res.status(500).send('Internal Server Error');
+    return res.status(500).json({ msg: 'Internal Server Error' });
   }
 };
 
@@ -114,11 +114,11 @@ async function updateOrderStatus(
     const { status } = req.body;
 
     const order = await OrderService.findOrderById(orderId);
-    if (!order) return res.status(404).send('Order not found.');
+    if (!order) return res.status(404).json({ msg: 'Order not found.' });
 
-    const restaurant = await RestaurantService.findById(String(order.restaurant));
+    const restaurant = await RestaurantService.findRestauntById(String(order.restaurant));
     if (restaurant?.user?._id.toString() !== req.userId) {
-      return res.status(401).send(`User can't update order status.`);
+      return res.status(401).json({ msg: `User can't update order status.` });
     }
 
     order.status = status;
@@ -127,7 +127,7 @@ async function updateOrderStatus(
     return res.status(200).json(order);
   } catch (error) {
     log.error(`An error occurred, ${error}`);
-    return res.status(500).send('Internal Server Error');
+    return res.status(500).json({ msg: 'Internal Server Error' });
   }
 };
 

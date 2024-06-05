@@ -1,12 +1,12 @@
 import { FilterQuery, UpdateQuery } from 'mongoose';
 import Restaurant, { RestaurantType } from '../models/restaurant';
 
-const findById = async (id: string) => {
+const findRestauntById= async (id: string) => {
   const restaurant = await Restaurant.findById(id);
   return restaurant;
 }
 
-const search = async ({ query, skip, limit, sortOption }: { 
+const searchRestaurant = async ({ query, skip, limit, sortOption }: { 
   query: any, 
   skip: number, 
   limit: number, 
@@ -44,8 +44,8 @@ const updateRestaurant = async (
 }
 
 export default { 
-  search,
-  findById, 
+  searchRestaurant,
+  findRestauntById, 
   findRestaurant, 
   createRestaurant, 
   updateRestaurant, 
