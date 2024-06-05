@@ -15,11 +15,4 @@ async function createFave(data: FavoriteModelType) {
   return favorite;
 }
 
-async function removeFave({ user, restaurant }: FavoriteModelType) {
-  const bookmark = await Favorite.findOne({ user, restaurant });
-  if (!bookmark) return false;
-  await bookmark.deleteOne();
-  return true;
-}
-
-export default { findFavorite, createFave, removeFave, getUserFavorites }
+export default { findFavorite, createFave, getUserFavorites }
