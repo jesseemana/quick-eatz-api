@@ -4,6 +4,9 @@ const MenuItem = z.object({
   name: z.string({
     required_error: 'item name is required'
   }).min(4, 'name must be more than 4 characters'),
+  decription: z.string({
+    required_error: 'item decription is required'
+  }).min(4, 'name must be more than 4 characters'),
   price: z.coerce.number({ 
     required_error: 'item price is required' 
   }).min(1, 'price must be more than 4 characters'),
@@ -20,18 +23,18 @@ export const restaurantSchema = z.object({
     country: z.string({ 
       required_error: 'country is required' 
     }),
-    deliveryPrice: z.coerce.number({ 
-      required_error: 'delivery price is required', 
-      invalid_type_error: 'must be a valid number'
-    }),
-    deliveryMin: z.coerce.number({ 
-      required_error: 'delivery time min is required', 
-      invalid_type_error: 'must be a valid number'
-    }),
+    delivery: z.boolean({
+      required_error: 'delivery availability is required'
+    }).optional(),
+    deliveryPrice: z.coerce.number({  
+      invalid_type_error: 'delivery price must be a valid number'
+    }).optional(),
+    deliveryMin: z.coerce.number({  
+      invalid_type_error: 'delivery min must be a valid number'
+    }).optional(),
     deliveryMax: z.coerce.number({ 
-      required_error: 'delivery time max is required', 
-      invalid_type_error: 'must be a valid number'
-    }),
+      invalid_type_error: 'delivery max must be a valid number'
+    }).optional(),
     estimatedDeliveryTime: z.coerce.number({ 
       required_error: 'delivery price is required', 
       invalid_type_error: 'must be avlid number', 

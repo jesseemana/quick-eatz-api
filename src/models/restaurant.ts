@@ -10,6 +10,7 @@ const menuItemSchema = new mongoose.Schema({
     default: () => new mongoose.Types.ObjectId(),
   },
   name: { type: String, required: true },
+  decription: { type: String, required: true },
   price: { type: Number, required: true },
 });
 
@@ -20,9 +21,10 @@ const restaurantSchema = new mongoose.Schema({
   },
   city: { type: String, required: true },
   country: { type: String, required: true },
-  deliveryPrice: { type: Number, required: true },
-  deliveryMin: { type: Number, required: true },
-  deliveryMax: { type: Number, required: true },
+  delivery: { type: Boolean },
+  deliveryPrice: { type: Number },
+  deliveryMin: { type: Number },
+  deliveryMax: { type: Number },
   restaurantName: { type: String, required: true },
   estimatedDeliveryTime: { type: Number, required: true },
   cuisines: [{ type: String, required: true }],

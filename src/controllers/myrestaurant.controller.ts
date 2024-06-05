@@ -12,7 +12,7 @@ async function getMyRestaurant(req: Request, res: Response) {
     if (!restaurant) return res.status(404).send('Restaurant not found.'); 
     return res.status(200).json(restaurant);
   } catch (error) {
-    log.error('An error occured', error);
+    log.error(`An error occurred, ${error}`);
     return res.status(500).send('Internal Server Error');
   }
 };
@@ -49,7 +49,7 @@ async function createMyRestaurant(
 
     return res.status(201).json(restaurant);
   } catch (error) {
-    log.error('An error occured', error);
+    log.error(`An error occurred, ${error}`);
     return res.status(500).send('Internal Server Error');
   }
 };
@@ -73,6 +73,7 @@ async function updateMyRestaurant(
 
     const updated = await RestaurantService.updateRestaurant({ user: req.userId }, { 
       ...req.body, 
+      menuItems: new mongoose.Types.DocumentArray(req.body.menuItems),
       image: imageResponse.image, 
       thumbNail: thumbNailResponse.image,
       lastUpdated: new Date(), 
@@ -80,7 +81,7 @@ async function updateMyRestaurant(
 
     return res.status(200).json(updated);
   } catch (error) {
-    log.error('An error occured', error);
+    log.error(`An error occurred, ${error}`);
     return res.status(500).send('Internal Server Error');
   }
 };
@@ -98,7 +99,7 @@ async function getMyRestaurantOrders(req: Request, res: Response) {
 
     return res.status(200).json(orders);
   } catch (error) {
-    log.error('An error occured', error);
+    log.error(`An error occurred, ${error}`);
     return res.status(500).send('Internal Server Error');
   }
 };
@@ -125,7 +126,7 @@ async function updateOrderStatus(
 
     return res.status(200).json(order);
   } catch (error) {
-    log.error('An error occured', error);
+    log.error(`An error occurred, ${error}`);
     return res.status(500).send('Internal Server Error');
   }
 };
