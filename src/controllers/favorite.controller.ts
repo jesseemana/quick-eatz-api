@@ -1,15 +1,14 @@
 import mongoose from 'mongoose';
 import { Request, Response } from 'express';
-import { RestaurantService, FavoriteService } from '../services';
+import { RestaurantService, FavoritesService } from '../services';
 import { log } from '../utils';
 import { SearchType } from '../schema/restaurant.schema';
-import Favorite from '../models/favorites';
 
-// TODO: remove later, for dev purposes only
+// TODO: for dev purposes only, remove later
 async function getAll(_req: Request, res: Response) {
   try {
-    const bookmarks = await Favorite.find({});
-    return res.json(bookmarks);
+    const bookmarks = await FavoritesService.findAll();
+    res.json(bookmarks);
   } catch (error) {
     log.error(`An error occurred, ${error}`);
     return res.status(500).send('Internal Server Error');
@@ -19,13 +18,13 @@ async function getAll(_req: Request, res: Response) {
 async function getUserBookmarks(req: Request, res: Response) {
   try {
     const user = req.userId;
-    const favorites = await FavoriteService.getUserFavorites(user);
-    if (!favorites) return res.status(404).send({ msg: 'User has no bookmarks' });
+    const favorites = await FavoritesService.getUserFavorites(user);
+    if (!favorites) return res.status(404).send([]);
     const restaurants = await Promise.all(favorites.map(async (favorite) => {
       const restaurant = await RestaurantService.findRestauntById(String(favorite.restaurant));
       return restaurant;
     }));
-    return res.status(200).json(restaurants);
+    res.status(200).json(restaurants);
   } catch (error) {
     log.error(`An error occurred, ${error}`);
     return res.status(500).send('Internal Server Error');
@@ -43,19 +42,13 @@ async function checkFavorite(
     const restaurant = await RestaurantService.findRestauntById(restaurantId as string);
     if (!restaurant) return res.status(404).json({ msg: 'Restaurant does not exist' });
 
-    const isBookmarked = await FavoriteService.findFavorite({ 
+    const isBookmarked = await FavoritesService.findFavorite({ 
       user: new mongoose.Types.ObjectId(userId), 
       restaurant: restaurant._id, 
     });
-    if (!isBookmarked) return res.status(404).json({ 
-      msg: 'Restaurant is not bookmarked',
-      bookmarked: false,
-    });
+    if (!isBookmarked) return res.status(404).json({ bookmarked: false });
 
-    return res.status(200).json({ 
-      msg: 'Restaurant is bookmarked', 
-      bookmarked: true,  
-    });
+    res.status(200).json({ bookmarked: true });
   } catch (error) {
     log.error(`An error occurred, ${error}`);
     return res.status(500).send('Internal Server Error');
@@ -73,13 +66,13 @@ async function addFavorite(
     const restaurant = await RestaurantService.findRestauntById(restaurantId as string);
     if (!restaurant) return res.status(404).json({ msg: 'Restaurant does not exist' });
 
-    const isBookmarked = await FavoriteService.findFavorite({ 
+    const isBookmarked = await FavoritesService.findFavorite({ 
       user: new mongoose.Types.ObjectId(userId), 
       restaurant: restaurant._id, 
     });
     if (isBookmarked) return res.status(400).json({ msg: 'Restaurant is already bookmarked' });
 
-    const favorite = await FavoriteService.createFave({ 
+    const favorite = await FavoritesService.createFave({ 
       user: new mongoose.Types.ObjectId(userId), 
       restaurant: restaurant._id, 
     });
@@ -87,7 +80,7 @@ async function addFavorite(
       return res.status(400).send({ msg: 'Failed to add to favorites' });
     }
 
-    return res.status(201).send({ msg: 'Added to favorites' });
+    res.status(201).send({ msg: 'Added to favorites' });
   } catch (error) {
     log.error(`An error occurred, ${error}`);
     return res.status(500).send('Internal Server Error');
@@ -105,7 +98,7 @@ async function deleteFavorite(
     const restaurant = await RestaurantService.findRestauntById(restaurantId as string);
     if (!restaurant) return res.status(404).json({ msg: 'Restaurant does not exist' });
 
-    const bookmark = await FavoriteService.findFavorite({ 
+    const bookmark = await FavoritesService.findFavorite({ 
       user: new mongoose.Types.ObjectId(userId), 
       restaurant: restaurant._id, 
     });
@@ -115,7 +108,7 @@ async function deleteFavorite(
 
     await bookmark.deleteOne();
 
-    return res.status(200).send({ msg: 'Removed from favorites' });
+    res.status(200).send({ msg: 'Removed from favorites' });
   } catch (error) {
     log.error(`An error occurred, ${error}`);
     return res.status(500).send('Internal Server Error');

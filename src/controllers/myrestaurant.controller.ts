@@ -10,7 +10,7 @@ async function getMyRestaurant(req: Request, res: Response) {
   try {
     const restaurant = await RestaurantService.findRestaurant(req.userId);
     if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found.' }); 
-    return res.status(200).json(restaurant);
+    res.status(200).json(restaurant);
   } catch (error) {
     log.error(`An error occurred, ${error}`);
     return res.status(500).json({ msg: 'Internal Server Error' });
@@ -47,7 +47,7 @@ async function createMyRestaurant(
       lastUpdated: new Date(),
     });
 
-    return res.status(201).json(restaurant);
+    res.status(201).json(restaurant);
   } catch (error) {
     log.error(`An error occurred, ${error}`);
     return res.status(500).json({ msg: 'Internal Server Error' });
@@ -79,7 +79,7 @@ async function updateMyRestaurant(
       lastUpdated: new Date(), 
     });
 
-    return res.status(200).json(updated);
+    res.status(200).json(updated);
   } catch (error) {
     log.error(`An error occurred, ${error}`);
     return res.status(500).json({ msg: 'Internal Server Error' });
@@ -97,7 +97,7 @@ async function getMyRestaurantOrders(req: Request, res: Response) {
       return res.status(404).json({ msg: `You currently don't have any orders.` });
     }
 
-    return res.status(200).json(orders);
+    res.status(200).json(orders);
   } catch (error) {
     log.error(`An error occurred, ${error}`);
     return res.status(500).json({ msg: 'Internal Server Error' });
@@ -110,8 +110,8 @@ async function updateOrderStatus(
   res: Response
 ) {
   try {
-    const { orderId } = req.params;
     const { status } = req.body;
+    const { orderId } = req.params;
 
     const order = await OrderService.findOrderById(orderId);
     if (!order) return res.status(404).json({ msg: 'Order not found.' });
@@ -123,8 +123,8 @@ async function updateOrderStatus(
 
     order.status = status;
     await order.save();
-
-    return res.status(200).json(order);
+    
+    res.status(200).json(order);
   } catch (error) {
     log.error(`An error occurred, ${error}`);
     return res.status(500).json({ msg: 'Internal Server Error' });

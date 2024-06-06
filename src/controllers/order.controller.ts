@@ -15,7 +15,7 @@ async function getMyOrders(req: Request, res: Response) {
     if (!orders) {
       return res.status(404).json({ msg: `You currently don't have any orders` });
     }
-    return res.status(200).json(orders);
+    res.status(200).json(orders);
   } catch (error) {
     log.error(`An error occurred, ${error}`);
     return res.status(500).send('Internal Server Error');
@@ -52,7 +52,7 @@ async function createCheckoutSession(
     
     // only save order in db after it's successfully created in stripe
     await newOrder.save(); 
-    return res.status(200).json({ url: session.url });
+    res.status(200).json({ url: session.url });
   } catch (error) {
     log.error(`An error occurred, ${error}`);
     return res.status(500).send('Internal Server Error');

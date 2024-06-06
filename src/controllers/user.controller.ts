@@ -7,7 +7,7 @@ async function getCurrentUser(req: Request, res: Response) {
   try {
     const currentUser = req.user;
     if (!currentUser) return res.status(404).send('No user found.');
-    return res.status(200).json(currentUser);
+    res.status(200).json(currentUser);
   } catch (error) {
     console.log(`An error occurred: ${error}`);
     return res.status(500).send(`Internal Server Error`);
@@ -21,13 +21,10 @@ async function registerUser(
 ) {
   try {
     const { auth0Id, email } = req.body;
-    
     const existingUser = await UserService.findUser({ auth0Id });
     if (existingUser) return res.status(200).send();
-    
     const newUser = await UserService.createUser({ auth0Id, email, });
-
-    return res.status(201).json(newUser.toObject());
+    res.status(201).json(newUser.toObject());
   } catch (error) {
     console.log(`An error occurred: ${error}`);
     return res.status(500).send(`Internal Server Error`);
@@ -49,12 +46,11 @@ async function updateCurrentUser(
     const updated = await UserService.updateUser({ _id: req.userId }, { name, city, phone, addressLine1, country });
     if (updated) return res.status(200).json(updated.toObject());
 
-    return res.status(400).send('Failed to update user');
+    res.status(400).send('Failed to update user');
   } catch (error) {
     console.log(`An error occurred: ${error}`);
     return res.status(500).send(`Internal Server Error`);
   }
 };
-
 
 export default { getCurrentUser, registerUser, updateCurrentUser, };

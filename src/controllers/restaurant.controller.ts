@@ -13,7 +13,7 @@ async function getRestaurant(
     const restaurant = await RestaurantService.findRestauntById(restaurantId as string);
     if (!restaurant) return res.status(404).json({ message: 'restaurant not found' });
 
-    return res.status(200).send(restaurant);
+    res.status(200).send(restaurant);
   } catch (error) {
     log.error(`An error occurred, ${error}`);
     res.status(500).json({ message: 'Internal Server Error!' });
@@ -69,7 +69,7 @@ async function searchRestaurant(
 
     const total = await RestaurantService.countRestaurants(query);
 
-    return res.status(200).json({
+    res.status(200).json({
       data: restaurants,
       pagination: {
         page: page,
