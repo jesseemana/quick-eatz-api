@@ -4,7 +4,7 @@ const MenuItem = z.object({
   name: z.string({
     required_error: 'item name is required'
   }).min(4, 'name must be more than 4 characters'),
-  decription: z.string({
+  description: z.string({
     required_error: 'item decription is required'
   }).min(4, 'name must be more than 4 characters'),
   price: z.coerce.number({ 
