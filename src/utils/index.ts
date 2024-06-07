@@ -1,5 +1,5 @@
 import log from './logger';
 import database from './database';
-import uploadImage from './upload';
+import { uploadImage, uploadThumb } from './upload'
 
-export { log, database, uploadImage, }
+export { log, database, uploadImage, uploadThumb, }
