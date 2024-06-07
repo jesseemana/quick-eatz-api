@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
-import { log, uploadImage } from '../utils';
+import { log, uploadImage, uploadThumb } from '../utils';
 import { OrderStatusType } from '../schema/order.schema';
 import { RestaurantType } from '../schema/restaurant.schema';
 import { OrderService, RestaurantService } from '../services';
-
 
 async function getMyRestaurant(req: Request, res: Response) {
   try {
@@ -16,7 +15,6 @@ async function getMyRestaurant(req: Request, res: Response) {
     return res.status(500).json({ msg: 'Internal Server Error' });
   }
 };
-
 
 async function createMyRestaurant(
   req: Request<{}, {}, RestaurantType>, 
@@ -32,7 +30,7 @@ async function createMyRestaurant(
 
     const [imageResponse, thumbNailResponse] = await Promise.all([
       uploadImage(image),
-      uploadImage(thumbNail),
+      uploadThumb(thumbNail),
     ]);
 
     if (!imageResponse || !thumbNailResponse) 
@@ -65,7 +63,7 @@ async function updateMyRestaurant(
 
     const [imageResponse, thumbNailResponse] = await Promise.all([
       uploadImage(image),
-      uploadImage(thumbNail),
+      uploadThumb(thumbNail),
     ]);
 
     if (!imageResponse || !thumbNailResponse) 
