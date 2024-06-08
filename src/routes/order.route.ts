@@ -7,6 +7,8 @@ const router = Router();
 
 router.get('/', [jwtCheck, jwtParse], OrderController.getMyOrders);
 
+router.get('/:orderId', [jwtCheck, jwtParse], OrderController.getSingleOrder);
+
 router.post(
   '/checkout/create-checkout-session', 
   [jwtCheck, jwtParse, validateInput(checkoutData)],
