@@ -23,8 +23,8 @@ async function getMyOrders(req: Request, res: Response) {
 }
 
 async function getSingleOrder(req: Request, res: Response) {
-  const { orderId } = req.params;
   try {
+    const { orderId } = req.params;
     const order = await OrderService.findOrderById(orderId);
     if (!order) return res.status(404).json({ msg: 'Order not found' });
     res.status(200).json(order);
