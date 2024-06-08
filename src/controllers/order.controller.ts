@@ -22,6 +22,18 @@ async function getMyOrders(req: Request, res: Response) {
   }
 }
 
+async function getSingleOrder(req: Request, res: Response) {
+  const { orderId } = req.params;
+  try {
+    const order = await OrderService.findOrderById(orderId);
+    if (!order) return res.status(404).json({ msg: 'Order not found' });
+    res.status(200).json(order);
+  } catch (error) {
+    log.error(`An error occurred, ${error}`);
+    return res.status(500).send('Internal Server Error');
+  }
+}
+
 async function createCheckoutSession(
   req: Request<{}, {}, CheckoutSessionRequestType>, 
   res: Response
@@ -143,4 +155,9 @@ const stripeWebhookHandler = async (req: Request, res: Response) => {
   return res.status(200).send();
 }
 
-export default { createCheckoutSession, getMyOrders, stripeWebhookHandler, };
+export default { 
+  getSingleOrder, 
+  createCheckoutSession, 
+  getMyOrders, 
+  stripeWebhookHandler, 
+};
