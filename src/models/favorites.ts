@@ -5,11 +5,13 @@ export type FavoriteModelType = InferSchemaType<typeof favoriteSchema>;
 const favoriteSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User'
+    ref: 'User',
+    required: true,
   },
   restaurant: {
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Restaurant'
+    ref: 'Restaurant',
+    required: true,
   },
 });
 
