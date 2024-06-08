@@ -8,7 +8,7 @@ import { OrderService, RestaurantService } from '../services';
 async function getMyRestaurant(req: Request, res: Response) {
   try {
     const restaurant = await RestaurantService.findRestaurant(req.userId);
-    if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found.' }); 
+    if (!restaurant) return res.status(200).json({ msg: 'Restaurant not found.' }); 
     res.status(200).json(restaurant);
   } catch (error) {
     log.error(`An error occurred, ${error}`);

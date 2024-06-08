@@ -21,7 +21,7 @@ async function getUserBookmarks(req: Request, res: Response) {
     const favorites = await FavoritesService.getUserFavorites(user);
     if (!favorites) return res.status(404).send([]);
     const restaurants = await Promise.all(favorites.map(async (favorite) => {
-      const restaurant = await RestaurantService.findRestauntById(String(favorite.restaurant));
+      const restaurant = await RestaurantService.findRestauntById(favorite.restaurant.toString());
       return restaurant;
     }));
     res.status(200).json(restaurants);
