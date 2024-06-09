@@ -44,24 +44,6 @@ export const restaurantSchema = z.object({
   }),
 });
 
-export const reviewschema = z.object({
-  body: z.object({
-    review: z.string({
-      required_error: 'provide your review'
-    })
-    .min(4, 'Review can not be less than 4 characters')
-    .optional()
-  }),
-  params: z.object({
-    restaurantId: z.string({ 
-      required_error: 'restaurant id is required' 
-    }).optional(),
-    reviewId: z.string({ 
-      required_error: 'review id is required' 
-    }).optional()
-  }),
-});
-
 export const searchSchema = z.object({
   params: z.object({
     restaurantId: z.string({ 
@@ -73,6 +55,5 @@ export const searchSchema = z.object({
   }),
 });
 
-export type ReviewType = z.infer<typeof reviewschema>;
 export type SearchType = z.infer<typeof searchSchema>['params'];
 export type RestaurantType = z.infer<typeof restaurantSchema>['body'];
