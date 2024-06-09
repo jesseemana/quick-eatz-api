@@ -6,7 +6,7 @@ import { createdReviewschema, reviewchema } from '../schema/review.schema';
 const router = Router();
 
 router.route('/:restaurantId')
-  .get([jwtCheck, jwtParse, validateInput(reviewchema)], ReviewController.getRestaurantReviews)
+  .get(validateInput(reviewchema), ReviewController.getRestaurantReviews)
   .post([jwtCheck, jwtParse, validateInput(createdReviewschema)], ReviewController.postReview);
 
 router.put(
