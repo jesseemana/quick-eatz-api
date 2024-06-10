@@ -1,14 +1,15 @@
 import mongoose from 'mongoose';
 import log from './logger';
 
-const connection_string = process.env.MONGODB_CONNECTION_STRING as string;
-
 async function connect() {
   try {
-    await mongoose.connect(connection_string, { dbName: 'QuickEatz' });
+    await mongoose.connect(
+      process.env.MONGODB_CONNECTION_STRING as string, 
+      { dbName: 'QuickEatz', maxPoolSize: 10, }
+    );
     log.info('Database connected.');
   } catch (error) {
-    log.error(`Failed to connect to database, ${error}`);
+    log.error(`Database connection failed, ${error}`);
   }
 }
 
@@ -17,7 +18,7 @@ async function disconnect() {
     await mongoose.connection.close();
     log.fatal('Database connection closed due to app termination.');
   } catch (error) {
-    log.error(`Failed to connect to database, ${error}`);
+    log.error(`Database connection failed, ${error}`);
   }
 }
 
