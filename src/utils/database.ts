@@ -5,7 +5,10 @@ async function connect() {
   try {
     await mongoose.connect(
       process.env.MONGODB_CONNECTION_STRING as string, 
-      { dbName: 'QuickEatz', maxPoolSize: 10, }
+      { 
+        dbName: 'QuickEatz', 
+        maxPoolSize: 10, 
+      }
     );
     log.info('Database connected.');
   } catch (error) {
