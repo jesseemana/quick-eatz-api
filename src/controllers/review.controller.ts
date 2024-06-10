@@ -17,7 +17,10 @@ async function getRestaurantReviews(
     }
 
     const foundReviews = await ReviewService.getReviews(restaurantId);
-    if (!foundReviews) return res.status(404).json([]);
+    if (!foundReviews) return res.status(200).json({ 
+      msg: "no reviews found", 
+      data: [] 
+    });
 
     const reviews = await Promise.all(foundReviews.map(async (review) => {
       const user = await UserService.findById(review.user.toString());
