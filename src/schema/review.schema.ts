@@ -6,6 +6,7 @@ export const createdReviewschema = z.object({
       required_error: 'provide your review'
     })
     .min(4, 'Review can not be less than 4 characters')
+    .trim()
   }),
   params: z.object({
     restaurantId: z.string({ 

@@ -16,15 +16,21 @@ export const restaurantSchema = z.object({
   body: z.object({
     restaurantName: z.string({ 
       required_error: 'restaurant name is required' 
-    }),
+    })
+    .min(4, 'provide a valid value for restaurant name')
+    .trim(),
     city: z.string({ 
       required_error: 'city is required' 
-    }),
+    })
+    .min(4, 'provide a valid value for city')
+    .trim(),
     country: z.string({ 
       required_error: 'country is required' 
-    }),
+    })
+    .min(4, 'provide a valid value for country')
+    .trim(),
     delivery: z.boolean({
-      required_error: 'delivery availability is required'
+      invalid_type_error: 'delivery must be a valid boolean'
     }).optional(),
     deliveryPrice: z.coerce.number({  
       invalid_type_error: 'delivery price must be a valid number'
