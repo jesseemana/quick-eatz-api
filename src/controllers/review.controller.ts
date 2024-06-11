@@ -12,15 +12,16 @@ async function getRestaurantReviews(
     const { restaurantId } = req.params;
 
     const restaurant = await RestaurantService.findRestauntById(restaurantId);
-    if (!restaurant) {
-      return res.status(404).json({ msg: 'Restaurant not found' });
-    }
+    if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found' });
 
-    const foundReviews = await ReviewService.getReviews(restaurantId);
-    if (!foundReviews) return res.status(200).json({ 
-      msg: "no reviews found", 
-      data: [] 
-    });
+    const [foundReviews, total] = await Promise.all([ 
+      ReviewService.getReviews(restaurantId), 
+      ReviewService.getTotalRestauantReviews(restaurantId), 
+    ]);
+
+    if (!foundReviews || !total) {
+      return res.status(200).json({ msg: 'Restaurant has no reviews' });
+    }
 
     const reviews = await Promise.all(foundReviews.map(async (review) => {
       const user = await UserService.findById(review.user.toString());
@@ -31,7 +32,10 @@ async function getRestaurantReviews(
       }
     }));
 
-    res.status(200).json(reviews);
+    res.status(200).json({
+      data: reviews,
+      total,
+    });
   } catch (error) {
     log.error(`An error occured, ${error}`);
     return res.status(500).json({ msg: 'Internal Server Error' });
