@@ -55,6 +55,7 @@ async function postReview(
       ...review,
       user: new mongoose.Types.ObjectId(user), 
       restaurant: new mongoose.Types.ObjectId(restaurantId),  
+      createdAt: new Date(),
     });
     if (!createdReview) {
       return res.status(400).send({ msg: 'Failed to create review' });
@@ -88,7 +89,10 @@ async function editReview(
     if (foundReview.user.toString() !== user) 
       return res.status(401).send({ msg: 'Only review owner can update it' });
 
-    const update = await ReviewService.updateReview({ _id: foundReview._id, user }, { ...review });
+    const update = await ReviewService.updateReview({ _id: foundReview._id, user }, {
+      ...review, 
+      createdAt: new Date(), 
+    });
     if (!update) return res.status(400).json({ msg: 'Failed to update review' });
 
     res.status(200).json(update);
