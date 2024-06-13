@@ -15,8 +15,8 @@ async function getRestaurantReviews(
     if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found' });
 
     const [foundReviews, total] = await Promise.all([ 
-      ReviewService.getReviews(restaurantId), 
-      ReviewService.getTotalRestauantReviews(restaurantId), 
+      ReviewService.getRestaurantReviews(restaurantId), 
+      ReviewService.getTotalRestaurantReviews(restaurantId), 
     ]);
 
     if (!foundReviews || !total) {
@@ -32,10 +32,7 @@ async function getRestaurantReviews(
       }
     }));
 
-    res.status(200).json({
-      data: reviews,
-      total,
-    });
+    res.status(200).json({ reviews, total, });
   } catch (error) {
     log.error(`An error occured, ${error}`);
     return res.status(500).json({ msg: 'Internal Server Error' });

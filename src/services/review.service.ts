@@ -19,20 +19,20 @@ async function updateReview(
   return updated;
 }
 
-async function getTotalRestauantReviews(restaurant: string) {
-  const totalReviews = await Review.countDocuments({ restaurant });
+async function getTotalRestaurantReviews(restaurant: string) {
+  const totalReviews = await Review.countDocuments({ restaurant }).sort({ createdAt: 'desc' });
   return totalReviews;
 }
 
-async function getReviews(restaurant: string) {
+async function getRestaurantReviews(restaurant: string) {
   const reviews = await Review.find({ restaurant });
   return reviews;
 }
 
 export default { 
-  createReview, 
+  getRestaurantReviews, 
   findReview, 
+  createReview, 
   updateReview, 
-  getReviews, 
-  getTotalRestauantReviews, 
+  getTotalRestaurantReviews, 
 }
