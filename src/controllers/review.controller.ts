@@ -19,9 +19,7 @@ async function getRestaurantReviews(
       ReviewService.getTotalRestaurantReviews(restaurantId), 
     ]);
 
-    if (!foundReviews || !total) {
-      return res.status(200).json({ msg: 'Restaurant has no reviews' });
-    }
+    if (!foundReviews || !total) return res.status(200).json([]); 
 
     const reviews = await Promise.all(foundReviews.map(async (review) => {
       const user = await UserService.findById(review.user.toString());
@@ -34,7 +32,7 @@ async function getRestaurantReviews(
 
     res.status(200).json({ reviews, total, });
   } catch (error) {
-    log.error(`An error occured, ${error}`);
+    log.error(`An error occurred. ${error}`);
     return res.status(500).json({ msg: 'Internal Server Error' });
   }
 }
@@ -46,23 +44,20 @@ async function postReview(
   try {
     const { restaurantId } = req.params;
     const user = req.userId;
-    const review = req.body;
+    const body = req.body;
 
     const restaurant = await RestaurantService.findRestauntById(restaurantId);
-    if (!restaurant) return res.status(400).json({ msg: 'Restaurant not found' });
+    if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found' });
 
-    const createdReview = await ReviewService.createReview({ 
-      ...review,
+    const review = await ReviewService.createReview({ 
+      ...body,
       user: new mongoose.Types.ObjectId(user), 
       restaurant: new mongoose.Types.ObjectId(restaurantId), 
     });
-    if (!createdReview) {
-      return res.status(400).send({ msg: 'Failed to create review' });
-    }
 
-    res.status(201).json(createdReview);
+    res.status(201).json(review);
   } catch (error) {
-    log.error(`An error occured, ${error}`);
+    log.error(`An error occurred. ${error}`);
     return res.status(500).json({ msg: 'Internal Server Error' });
   }
 }
@@ -93,7 +88,7 @@ async function editReview(
 
     res.status(200).json(update);
   } catch (error) {
-    log.error(`An error occured, ${error}`);
+    log.error(`An error occurred. ${error}`);
     return res.status(500).json({ msg: 'Internal Server Error' });
   }
 }

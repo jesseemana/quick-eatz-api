@@ -12,7 +12,7 @@ async function connect() {
     );
     log.info('Database connected.');
   } catch (error) {
-    log.error(`Database connection failed, ${error}`);
+    log.error(`Database connection failed. ${error}`);
   }
 }
 
@@ -21,7 +21,7 @@ async function disconnect() {
     await mongoose.connection.close();
     log.fatal('Database connection closed due to app termination.');
   } catch (error) {
-    log.error(`Database connection failed, ${error}`);
+    log.error(`Database connection failed. ${error}`);
   }
 }
 
