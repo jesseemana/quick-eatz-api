@@ -17,7 +17,6 @@ const searchRestaurant = async ({ query, skip, limit, sortOption }: {
     .limit(limit)
     .skip(skip)
     .lean();
-    
   return restaurants;
 }
 
@@ -26,13 +25,14 @@ const findRestaurant = async (user_id: string) => {
   return restaurant;
 }
 
-const createRestaurant = async (data: RestaurantType) => {
+const createRestaurant = async (data: Partial<RestaurantType>) => {
   const restaurant = await Restaurant.create(data)
   return restaurant;
 }
 
 async function countRestaurants(query: any) {
-  return await Restaurant.countDocuments(query);
+  const total = await Restaurant.countDocuments(query);
+  return total;
 }
 
 const updateRestaurant = async (

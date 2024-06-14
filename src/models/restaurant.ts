@@ -10,8 +10,8 @@ const menuItemSchema = new mongoose.Schema({
     default: () => new mongoose.Types.ObjectId(),
   },
   name: { type: String, required: true },
-  description: { type: String, required: true },
   price: { type: Number, required: true },
+  description: { type: String, required: true },
 });
 
 const restaurantSchema = new mongoose.Schema({
@@ -25,15 +25,32 @@ const restaurantSchema = new mongoose.Schema({
   deliveryPrice: { type: Number },
   deliveryMin: { type: Number },
   deliveryMax: { type: Number },
-  restaurantName: { type: String, required: true },
-  estimatedDeliveryTime: { type: Number, required: true },
-  cuisines: [{ type: String, required: true }],
+  restaurantName: { 
+    type: String, 
+    required: true, 
+  },
+  estimatedDeliveryTime: { 
+    type: Number, 
+    required: true, 
+  },
+  cuisines: [{ 
+    type: String, 
+    required: true, 
+  }],
   menuItems: [menuItemSchema],
-  thumbNail: { type: String, required: true },
-  image: { type: String, required: true },
-  lastUpdated: { type: Date, required: true, },
+  thumbNail: { 
+    type: String, 
+    required: true, 
+  },
+  image: { 
+    type: String, 
+    required: true, 
+  },
+  lastUpdated: { 
+    type: Date, 
+    default: new Date(), 
+  },
 });
 
 const Restaurant = mongoose.model('Restaurant', restaurantSchema);
-
 export default Restaurant;

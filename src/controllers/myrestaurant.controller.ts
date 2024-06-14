@@ -42,7 +42,6 @@ async function createMyRestaurant(
       menuItems: new mongoose.Types.DocumentArray(req.body.menuItems),
       image: imageResponse.image,
       thumbNail: thumbNailResponse.image,
-      lastUpdated: new Date(),
     });
 
     res.status(201).json(restaurant);
@@ -51,7 +50,6 @@ async function createMyRestaurant(
     return res.status(500).json({ msg: 'Internal Server Error' });
   }
 };
-
 
 async function updateMyRestaurant(
   req: Request<{}, {}, RestaurantType>, 
@@ -74,7 +72,6 @@ async function updateMyRestaurant(
       menuItems: new mongoose.Types.DocumentArray(req.body.menuItems),
       image: imageResponse.image, 
       thumbNail: thumbNailResponse.image,
-      lastUpdated: new Date(), 
     });
 
     res.status(200).json(updated);
@@ -83,7 +80,6 @@ async function updateMyRestaurant(
     return res.status(500).json({ msg: 'Internal Server Error' });
   }
 };
-
 
 async function getMyRestaurantOrders(req: Request, res: Response) {
   try {
@@ -101,7 +97,6 @@ async function getMyRestaurantOrders(req: Request, res: Response) {
     return res.status(500).json({ msg: 'Internal Server Error' });
   }
 };
-
 
 async function updateOrderStatus(
   req: Request<OrderStatusType['params'], {}, OrderStatusType['body']>, 
@@ -128,7 +123,6 @@ async function updateOrderStatus(
     return res.status(500).json({ msg: 'Internal Server Error' });
   }
 };
-
 
 export default {
   getMyRestaurantOrders,
