@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
 import mongoose from 'mongoose';
+import { Request, Response } from 'express';
 import { log, uploadImage, uploadThumb } from '../utils';
 import { OrderStatusType } from '../schema/order.schema';
 import { RestaurantType } from '../schema/restaurant.schema';
@@ -11,7 +11,7 @@ async function getMyRestaurant(req: Request, res: Response) {
     if (!restaurant) return res.status(200).json({ msg: 'Restaurant not found.' }); 
     res.status(200).json(restaurant);
   } catch (error) {
-    log.error(`An error occurred, ${error}`);
+    log.error(`An error occurred. ${error}`);
     return res.status(500).json({ msg: 'Internal Server Error' });
   }
 };
@@ -22,31 +22,31 @@ async function createMyRestaurant(
 ) {
   try {
     // @ts-ignore
-    const [image, thumbNail] = Object.values(req.files).map(files => files[0])
+    const [imageFile, thumbNailFile] = Object.values(req.files).map(files => files[0])
 
     const existingRestaurant = await RestaurantService.findRestaurant(req.userId);
     if (existingRestaurant) 
       return res.status(409).json({ msg: 'User restaurant already exists.' });
 
-    const [imageResponse, thumbNailResponse] = await Promise.all([
-      uploadImage(image),
-      uploadThumb(thumbNail),
+    const [image, thumbNail] = await Promise.all([
+      uploadImage(imageFile),
+      uploadThumb(thumbNailFile),
     ]);
 
-    if (!imageResponse || !thumbNailResponse) 
+    if (!image || !thumbNail) 
       return res.status(400).json({ msg: 'Failed to upload image' });
 
     const restaurant = await RestaurantService.createRestaurant({ 
       ...req.body,
       user: new mongoose.Types.ObjectId(req.userId), 
       menuItems: new mongoose.Types.DocumentArray(req.body.menuItems),
-      image: imageResponse.image,
-      thumbNail: thumbNailResponse.image,
+      image: image.image,
+      thumbNail: thumbNail.image,
     });
 
     res.status(201).json(restaurant);
   } catch (error) {
-    log.error(`An error occurred, ${error}`);
+    log.error(`An error occurred. ${error}`);
     return res.status(500).json({ msg: 'Internal Server Error' });
   }
 };
@@ -67,16 +67,16 @@ async function updateMyRestaurant(
     if (!imageResponse || !thumbNailResponse) 
       return res.status(400).json({ msg: 'Failed to upload image' });
 
-    const updated = await RestaurantService.updateRestaurant({ user: req.userId }, { 
+    await RestaurantService.updateRestaurant({ user: req.userId }, { 
       ...req.body, 
       menuItems: new mongoose.Types.DocumentArray(req.body.menuItems),
       image: imageResponse.image, 
       thumbNail: thumbNailResponse.image,
     });
 
-    res.status(200).json(updated);
+    res.status(200).json({ msg: 'Restaurant updated' });
   } catch (error) {
-    log.error(`An error occurred, ${error}`);
+    log.error(`An error occurred. ${error}`);
     return res.status(500).json({ msg: 'Internal Server Error' });
   }
 };
@@ -87,13 +87,12 @@ async function getMyRestaurantOrders(req: Request, res: Response) {
     if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found.' });
 
     const orders = await OrderService.findRestaurantOrders(restaurant._id.toString());
-    if (!orders) {
-      return res.status(404).json({ msg: `You currently don't have any orders.` });
-    }
+    if (!orders) 
+      return res.status(200).json({ msg: `You currently don't have any orders.` });
 
     res.status(200).json(orders);
   } catch (error) {
-    log.error(`An error occurred, ${error}`);
+    log.error(`An error occurred. ${error}`);
     return res.status(500).json({ msg: 'Internal Server Error' });
   }
 };
@@ -110,16 +109,16 @@ async function updateOrderStatus(
     if (!order) return res.status(404).json({ msg: 'Order not found.' });
 
     const restaurant = await RestaurantService.findRestauntById(String(order.restaurant));
-    if (restaurant?.user?._id.toString() !== req.userId) {
+    if (!restaurant || !restaurant.user) return res.status(400).send('Restaurant not found.');
+    if (restaurant.user._id.toString() !== req.userId) 
       return res.status(401).json({ msg: `User can't update order status.` });
-    }
 
     order.status = status;
     await order.save();
     
     res.status(200).json(order);
   } catch (error) {
-    log.error(`An error occurred, ${error}`);
+    log.error(`An error occurred. ${error}`);
     return res.status(500).json({ msg: 'Internal Server Error' });
   }
 };
