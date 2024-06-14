@@ -1,7 +1,7 @@
 import { FilterQuery, UpdateQuery } from 'mongoose';
 import Review, { ReviewType } from '../models/review';
 
-async function createReview(data: ReviewType) {
+async function createReview(data: Partial<ReviewType>) {
   const review = await Review.create(data);
   return review;
 }
