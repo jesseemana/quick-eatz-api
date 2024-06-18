@@ -25,7 +25,7 @@ async function getRestaurantReviews(
       const user = await UserService.findById(review.user.toString());
       if (!user) return res.status(404).json({ msg: 'User not found' });
       return {
-        user: user.name,
+        user: user.name as string,
         review: review.review,
       }
     }));
