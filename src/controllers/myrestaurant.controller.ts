@@ -8,7 +8,7 @@ import { OrderService, RestaurantService } from '../services';
 async function getMyRestaurant(req: Request, res: Response) {
   try {
     const restaurant = await RestaurantService.findRestaurant(req.userId);
-    if (!restaurant) return res.status(200).json({ msg: 'Restaurant not found.' }); 
+    if (!restaurant) return res.status(404).json({ msg: 'Restaurant not found.' }); 
     res.status(200).json(restaurant);
   } catch (error) {
     log.error(`An error occurred. ${error}`);
@@ -88,7 +88,7 @@ async function getMyRestaurantOrders(req: Request, res: Response) {
 
     const orders = await OrderService.findRestaurantOrders(restaurant._id.toString());
     if (!orders) 
-      return res.status(200).json({ msg: `You currently don't have any orders.` });
+      return res.status(204).json({ msg: `You currently don't have any orders.` });
 
     res.status(200).json(orders);
   } catch (error) {
@@ -109,7 +109,7 @@ async function updateOrderStatus(
     if (!order) return res.status(404).json({ msg: 'Order not found.' });
 
     const restaurant = await RestaurantService.findRestauntById(String(order.restaurant));
-    if (!restaurant || !restaurant.user) return res.status(400).send('Restaurant not found.');
+    if (!restaurant || !restaurant.user) return res.status(400).send('Restaurant or user not found.');
     if (restaurant.user._id.toString() !== req.userId) 
       return res.status(401).json({ msg: `User can't update order status.` });
 

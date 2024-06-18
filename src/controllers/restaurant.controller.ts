@@ -15,7 +15,7 @@ async function getRestaurant(
 
     res.status(200).send(restaurant);
   } catch (error) {
-    log.error(`An error occurred, ${error}`);
+    log.error(`An error occurred. ${error}`);
     res.status(500).json({ message: 'Internal Server Error!' });
   }
 };
@@ -78,7 +78,7 @@ async function searchRestaurant(
       },
     });
   } catch (error) {
-    log.error(`An error occurred, ${error}`);
+    log.error(`An error occurred. ${error}`);
     return res.status(500).send('Internal Server Error!');
   }
 };

@@ -12,12 +12,10 @@ const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET as string;
 async function getMyOrders(req: Request, res: Response) {
   try {
     const orders = await OrderService.getMyOrders(req.userId);
-    if (!orders) {
-      return res.status(404).json({ msg: `You currently don't have any orders` });
-    }
+    if (!orders) return res.status(204).json({ msg: `You haven't placed any orders` });
     res.status(200).json(orders);
   } catch (error) {
-    log.error(`An error occurred, ${error}`);
+    log.error(`An error occurred. ${error}`);
     return res.status(500).send('Internal Server Error');
   }
 }
@@ -29,7 +27,7 @@ async function getSingleOrder(req: Request, res: Response) {
     if (!order) return res.status(404).json({ msg: 'Order not found' });
     res.status(200).json(order);
   } catch (error) {
-    log.error(`An error occurred, ${error}`);
+    log.error(`An error occurred. ${error}`);
     return res.status(500).send('Internal Server Error');
   }
 }
@@ -66,7 +64,7 @@ async function createCheckoutSession(
     await newOrder.save(); 
     res.status(200).json({ url: session.url });
   } catch (error) {
-    log.error(`An error occurred, ${error}`);
+    log.error(`An error occurred. ${error}`);
     return res.status(500).send('Internal Server Error');
   }
 }
@@ -141,7 +139,7 @@ const stripeWebhookHandler = async (req: Request, res: Response) => {
       STRIPE_WEBHOOK_SECRET
     );
   } catch (error: any) {
-    log.error(`An error occurred, ${error}`);
+    log.error(`An error occurred. ${error}`);
     return res.status(400).send(`Webhook error: ${error.message}`);
   }
 
