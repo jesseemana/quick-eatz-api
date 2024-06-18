@@ -17,13 +17,16 @@ async function getAll(_req: Request, res: Response) {
 
 async function getUserBookmarks(req: Request, res: Response) {
   try {
-    const user = req.userId;
-    const favorites = await FavoritesService.getUserFavorites(user);
+    const userId = req.userId;
+
+    const favorites = await FavoritesService.getUserFavorites(userId);
     if (!favorites) return res.status(204).send([]);
+
     const restaurants = await Promise.all(favorites.map(async (favorite) => {
       const restaurant = await RestaurantService.findRestauntById(favorite.restaurant.toString());
       return restaurant;
     }));
+
     res.status(200).json(restaurants);
   } catch (error) {
     log.error(`An error occurred. ${error}`);
@@ -35,10 +38,10 @@ async function checkFavorite(
   req: Request<SearchType, {}, {}>, 
   res: Response
 ) {
-  const userId = req.userId;
-  const { restaurantId } = req.params;
-
   try {
+    const userId = req.userId;
+    const { restaurantId } = req.params;
+
     const restaurant = await RestaurantService.findRestauntById(restaurantId as string);
     if (!restaurant) return res.status(404).json({ msg: 'Restaurant does not exist' });
 
@@ -60,10 +63,10 @@ async function addFavorite(
   req: Request<SearchType, {}, {}>, 
   res: Response
 ) {
-  const userId = req.userId;
-  const { restaurantId } = req.params;
-
   try {
+    const userId = req.userId;
+    const { restaurantId } = req.params;
+
     const restaurant = await RestaurantService.findRestauntById(restaurantId as string);
     if (!restaurant) return res.status(404).json({ msg: 'Restaurant does not exist' });
 
@@ -90,10 +93,10 @@ async function deleteFavorite(
   req: Request<SearchType, {}, {}>, 
   res: Response
 ) {
-  const userId = req.userId;
-  const { restaurantId } = req.params;
-
   try {
+    const userId = req.userId;
+    const { restaurantId } = req.params;
+    
     const restaurant = await RestaurantService.findRestauntById(restaurantId as string);
     if (!restaurant) return res.status(404).json({ msg: 'Restaurant does not exist' });
 
