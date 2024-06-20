@@ -19,7 +19,7 @@ async function getRestaurantReviews(
       ReviewService.getTotalRestaurantReviews(restaurantId), 
     ]);
 
-    if (!foundReviews || !total) return res.status(204).json([]); 
+    if (!foundReviews || !total) return res.sendStatus(204);
 
     const reviews = await Promise.all(foundReviews.map(async (review) => {
       const user = await UserService.findById(review.user.toString());
